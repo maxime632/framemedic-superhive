@@ -18,7 +18,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:1.6rem 1.6rem;
  -webkit-mask-image:linear-gradient(180deg,#000,transparent 70%);mask-image:linear-gradient(180deg,#000,transparent 70%)}
 @keyframes aur{to{filter:hue-rotate(-18deg);transform:translate3d(-1.5rem,1rem,0)}}
-.lbl{font:700 1.15rem/1.2 "SM",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--lime)}
+.lbl{font:700 1.25rem/1.2 "SM",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--lime)}
 .lbl.pink{color:var(--pink)}.lbl.mute{color:var(--mute)}.lbl.violet{color:#9d6bff}
 .h{font:800 2.7rem/1.05 "Panchang",sans-serif;text-transform:uppercase;letter-spacing:-.01em;word-spacing:.12em}
 .hl{background:var(--lime);color:var(--ink);padding:0 .12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
@@ -35,11 +35,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .pbtn .px{width:1.4rem;height:1.4rem;flex:none}
 .pbtn.lime{background:var(--lime);color:var(--ink)}.pbtn.dark{background:var(--s2)}
 .pbtn::after{content:attr(data-g);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--lime);opacity:0;pointer-events:none;mix-blend-mode:screen}
+.pbtn:has(.px)::after{padding-left:2.4rem}
 .pbtn:hover::after{animation:gl .5s steps(2) 1}
 @keyframes gl{0%{opacity:.9;transform:translate(.3rem,-.2rem)}50%{opacity:.6;transform:translate(-.3rem,.2rem)}100%{opacity:0;transform:none}}
-.pulse{animation:pls 1.8s var(--ease) infinite}
-@keyframes pls{0%{box-shadow:0 0 0 0 rgba(255,46,155,.55)}70%{box-shadow:0 0 0 1.8rem rgba(255,46,155,0)}100%{box-shadow:0 0 0 0 rgba(255,46,155,0)}}
-.foot{font:700 .95rem/1.4 "SM",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+/* the pulse sits on a wrapper: a clipped button would clip its own glow */
+.pulse{display:inline-block;animation:pls 1.8s var(--ease) infinite}
+@keyframes pls{0%{filter:drop-shadow(0 0 0 rgba(255,46,155,0))}45%{filter:drop-shadow(0 0 1.4rem rgba(255,46,155,.85))}100%{filter:drop-shadow(0 0 0 rgba(255,46,155,0))}}
+.foot{font:700 1.1rem/1.4 "SM",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
 .reveal{opacity:0;transform:translateY(1.2rem);transition:opacity .6s var(--ease),transform .6s var(--ease)}
 .in .reveal{opacity:1;transform:none}
 .in .reveal.d1{transition-delay:.08s}.in .reveal.d2{transition-delay:.16s}.in .reveal.d3{transition-delay:.24s}.in .reveal.d4{transition-delay:.32s}
