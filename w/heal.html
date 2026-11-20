@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<link rel="icon" href="data:,"><title>Frame Medic · Heal This Scene</title>
+<link rel="stylesheet" href="w.css">
+<style>
+.w{flex-direction:row}
+.view{position:relative;flex:1.35;min-width:0;background:#000;overflow:hidden}
+.view video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s}
+#vH{opacity:0}
+.done #vH{opacity:1}
+.scan{position:absolute;top:0;bottom:0;left:-30%;width:30%;pointer-events:none;opacity:0;
+ background:linear-gradient(90deg,rgba(206,255,5,0),rgba(206,255,5,.28) 75%,rgba(206,255,5,.85))}
+.scanning .scan{opacity:1;animation:sc 1.4s var(--e) infinite}
+@keyframes sc{to{left:100%}}
+.read{position:absolute;left:10px;top:10px;font-size:12px;background:rgba(10,10,10,.82);padding:7px 9px 6px;display:flex;align-items:center;gap:7px}
+.read i{width:8px;height:8px;background:var(--pink)}
+.read b{color:var(--pink)}
+.done .read i{background:var(--lime)}.done .read b{color:var(--lime)}
+.go{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);transition:opacity .3s}
+.busy .go,.done .go{opacity:0;pointer-events:none}
+.side{flex:1;min-width:0;margin-left:18px;display:flex;flex-direction:column}
+.steps{list-style:none;display:flex;flex-direction:column;gap:6px;flex:1}
+.steps li{flex:1;display:flex;flex-direction:column;justify-content:center;background:var(--s1);padding:6px 12px;border-left:3px solid var(--s3);transition:background .3s,border-color .3s;min-height:0}
+.steps b{font-size:12px;color:var(--mute);display:flex;align-items:center;gap:8px;transition:color .3s}
+.steps em{font-style:normal;width:19px;height:19px;display:inline-flex;align-items:center;justify-content:center;background:var(--s3);color:var(--soft);font-size:11px}
+.steps span{font-size:13px;color:var(--mute);margin-top:3px;opacity:.35;transition:opacity .3s,color .3s}
+.steps li.on{border-color:var(--pink);background:#211720}.steps li.on b{color:#fff}.steps li.on em{background:var(--pink);color:#fff}
+.steps li.ok{border-color:var(--lime)}.steps li.ok b{color:#fff}.steps li.ok em{background:var(--lime);color:#141414}
+.steps li.ok span,.steps li.on span{opacity:1;color:var(--txt)}
+.again{margin-top:8px;align-self:flex-start;visibility:hidden}
+.done .again{visibility:visible}
+@media (max-width:559px){
+ .w{flex-direction:column}
+ .view{flex:1;min-height:120px}
+ .side{margin:10px 0 0;flex:none}
+ .steps{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+ .steps li{padding:7px 9px}
+ .steps b{font-size:11px}.steps span{font-size:11.5px;line-height:1.25}
+ .again{position:absolute;right:20px;top:20px;margin:0}
+}
+</style></head>
+<body>
+<div class="w" id="w">
+  <div class="view cut" id="view">
+    <video id="vA" muted playsinline loop preload="auto" poster="../media/sing-orbit-alone.jpg" src="../media/sing-orbit-alone.mp4" aria-label="Blender alone"></video>
+    <video id="vH" muted playsinline loop preload="auto" poster="../media/sing-orbit-heal.jpg" src="../media/sing-orbit-heal.mp4" aria-label="After Heal This Scene"></video>
+    <span class="scan"></span>
+    <div class="read m"><i></i><b id="fps">1.6</b>FPS</div>
+    <span class="pulse go"><button class="cta" id="go"></button></span>
+  </div>
+  <div class="side">
+    <ol class="steps">
+      <li><b class="m"><em>1</em>SCAN</b><span>140 slowdowns, ranked by cost</span></li>
+      <li><b class="m"><em>2</em>FIX</b><span>12 fixes, renders unchanged</span></li>
+      <li><b class="m"><em>3</em>RELIEF</b><span>Solid, Material Preview, Rendered</span></li>
+      <li><b class="m"><em>4</em>TUNE</b><span>Health 2 → 100, measured</span></li>
+    </ol>
+    <button class="ghost again" id="again">↻ AGAIN</button>
+  </div>
+</div>
+<script src="w.js"></script>
+<script>
+// Singularity 100_0040, fixed 1.1.0 on River 7: Heal 5.9 s, 140 found, 12 fixed, health 2 -> 100, 1.64 -> 20.03 fps (Frame Dropping)
+const $ = id => document.getElementById(id), w = $('w'), vA = $('vA'), vH = $('vH');
+const steps = [...document.querySelectorAll('.steps li')];
+$('go').innerHTML = W.PLUS + 'HEAL THIS SCENE';
+let state = 'idle', seen = false, visible = false, runId = 0;
+async function run() {
+  if (state === 'busy') return;
+  const id = ++runId; state = 'busy';
+  w.classList.remove('done'); w.classList.add('busy');
+  $('fps').textContent = '1.6'; steps.forEach(s => s.classList.remove('on', 'ok'));
+  vA.play().catch(() => {});
+  const durs = [1500, 1200, 900, 1100];
+  for (let i = 0; i < 4; i++) {
+    if (id !== runId) return;
+    steps[i].classList.add('on');
+    if (i === 0) w.classList.add('scanning');
+    if (i === 3) { vH.currentTime = vA.currentTime || 0; vH.play().catch(() => {}); w.classList.add('done'); W.count($('fps'), 1.64, 20.03, 1300, 1); }
+    await W.wait(durs[i]);
+    if (id !== runId) return;
+    if (i === 0) w.classList.remove('scanning');
+    steps[i].classList.replace('on', 'ok');
+  }
+  w.classList.remove('busy'); state = 'done';
+  setTimeout(() => { if (state === 'done') vA.pause(); }, 700);
+}
+function reset() {
+  runId++; state = 'idle'; w.classList.remove('busy', 'done', 'scanning');
+  steps.forEach(s => s.classList.remove('on', 'ok')); $('fps').textContent = '1.6';
+  if (visible) vA.play().catch(() => {});
+  vH.pause();
+}
+$('go').onclick = run;
+$('again').onclick = () => { reset(); run(); };
+W.view(w, on => {
+  visible = on;
+  if (!on) { vA.pause(); vH.pause(); return; }
+  if (state === 'done') vH.play().catch(() => {}); else vA.play().catch(() => {});
+  if (!seen) { seen = true; setTimeout(() => { if (state === 'idle') run(); }, 1200); }
+});
+</script>
+</body></html>

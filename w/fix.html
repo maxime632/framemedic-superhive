@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<link rel="icon" href="data:,"><title>Frame Medic · It tells you why</title>
+<link rel="stylesheet" href="w.css">
+<style>
+.w{flex-direction:row}
+.list{flex:1.45;min-width:0;display:flex;flex-direction:column}
+.lh{display:flex;justify-content:space-between;font-size:11px;color:var(--mute);padding:0 2px 8px}
+.rows{display:flex;flex-direction:column;gap:6px;flex:1}
+.r{flex:1;display:flex;align-items:center;gap:10px;background:var(--s1);padding:6px 8px 6px 10px;border-left:3px solid transparent;cursor:pointer;min-height:0;transition:background .25s}
+.r.sel{border-color:var(--vio);background:#201c27}
+.n{flex:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--s3);color:var(--soft)}
+.r:first-child .n{background:var(--lime);color:#141414}
+.t{flex:1;min-width:0}
+.t b{display:block;font-size:13.5px;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.bar{display:block;height:4px;background:var(--s3);margin-top:6px}
+.bar i{display:block;height:100%;background:var(--soft)}
+.r:first-child .bar i{background:var(--lime)}
+.fx{flex:none;min-width:62px;min-height:36px;font:700 12px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.06em;background:var(--violet);color:#fff;padding:0 12px}
+.fx:hover{background:#7a2bff}
+.fx.keep{background:var(--s3);color:var(--soft)}
+.r.done{background:#1a2010}.r.done .n{background:var(--lime);color:#141414}
+.r.done .t b{color:var(--lime)}
+.r.done .bar{visibility:hidden}
+.r.done .fx{background:var(--s2);color:var(--soft)}
+.all{margin-top:8px;width:100%;justify-content:center}
+.card{flex:1;min-width:0;margin-left:16px;background:var(--s1);padding:16px 16px;display:flex;flex-direction:column;border-top:3px solid var(--vio)}
+.k{font-size:11px;color:var(--vio);margin-bottom:8px}
+.card p{font-size:14px;line-height:1.5;color:var(--soft)}
+.card p.do{color:var(--txt);margin-top:10px}
+.cnt{margin-top:auto;padding-top:10px;font-size:11px;color:var(--mute)}
+.cnt b{color:var(--lime)}
+@media (max-width:559px){
+ .w{flex-direction:column}
+ .lh{padding-bottom:6px}
+ .r{padding:5px 6px 5px 8px;gap:8px}
+ .t b{font-size:12px}
+ .fx{min-width:52px;min-height:32px;font-size:11px;padding:0 8px}
+ .card{margin:8px 0 0;flex:none;padding:9px 11px;border-top-width:2px}
+ .k{display:none}
+ .card p{font-size:12px;line-height:1.35}
+ .card p.do{display:none}
+ .cnt{display:none}
+}
+</style></head>
+<body>
+<div class="w" id="w">
+  <div class="list">
+    <div class="lh m"><span>SLOWDOWNS · SINGULARITY 100_0040</span><span>COST</span></div>
+    <div class="rows" id="rows"></div>
+    <button class="cta all" id="all">FIX ALL · RENDERS UNCHANGED</button>
+  </div>
+  <div class="card" aria-live="polite"><p class="k m" id="ck"></p><p id="cp"></p><p class="do" id="cd"></p><p class="cnt m" id="cnt"></p></div>
+</div>
+<script src="w.js"></script>
+<script>
+// slowdowns as the 1.1.0 scan writes them for Singularity 100_0040 (shortened), ranked by cost per frame (c)
+const IT = [
+  {t: 'GEO-kelp-long: scatter node group is heavy', c: 16.2, f: 'Kelp scatter paused in the viewport',
+   p: 'A Geometry Nodes scatter makes thousands of kelp leaves, computed again at every frame.',
+   d: 'Fix: pause it in the viewport. One click shows it again. Renders keep it.'},
+  {t: 'Cycles viewport: many samples, no denoiser', c: 15.5, f: 'Viewport samples 2048 → 64, denoised',
+   p: 'The Cycles view refines up to 2048 samples with no denoiser, so a clean picture takes long after each change.',
+   d: 'Fix: 64 samples with the denoiser while you work. Final renders keep their own samples.'},
+  {t: 'Deforming B-Bones: RIG-critter_evolved', c: 7.8, keep: true,
+   p: '65 deform bones are B-Bones (655 segments). They shape how the character bends.',
+   d: 'Left alone: the character bends exactly as rigged. Relief can lower them while you animate, if you choose.'},
+  {t: 'Hidden objects still computed every frame', c: 6.3, f: 'Hidden objects no longer computed',
+   p: 'The eye icon only hides the display: these objects are still evaluated on every frame.',
+   d: 'Fix: stop computing them until they are shown again. Renders untouched.'}
+];
+const $ = id => document.getElementById(id);
+let sel = 0, auto = true;
+function render() {
+  $('rows').innerHTML = IT.map((it, i) => `<div class="r${i === sel ? ' sel' : ''}${it.done ? ' done' : ''}" data-i="${i}">
+    <span class="n m">${it.done ? '✓' : i + 1}</span>
+    <span class="t"><b>${it.done ? it.f : it.t}</b><span class="bar"><i style="width:${it.c / 16.2 * 100}%"></i></span></span>
+    <button class="fx${it.keep ? ' keep' : ''}" data-i="${i}">${it.keep ? 'KEPT' : it.done ? 'UNDO' : 'FIX'}</button></div>`).join('');
+  const it = IT[sel];
+  $('ck').textContent = it.keep ? 'LEFT ALONE' : it.done ? 'FIXED' : 'WHAT IT IS';
+  $('cp').textContent = it.p; $('cd').textContent = it.d;
+  const n = IT.filter(x => x.done).length;
+  $('cnt').innerHTML = `FIXED <b>${n}</b> · EACH ONE CAN BE UNDONE`;
+  $('all').disabled = !IT.some(x => !x.keep && !x.done);
+}
+function act(i) {
+  sel = i;
+  if (!IT[i].keep) IT[i].done = !IT[i].done;
+  render();
+}
+$('rows').addEventListener('click', e => {
+  auto = false;
+  const b = e.target.closest('.fx'), r = e.target.closest('.r');
+  if (b) act(+b.dataset.i); else if (r) { sel = +r.dataset.i; render(); }
+});
+$('all').onclick = () => { auto = false; IT.forEach((x, i) => { if (!x.keep && !x.done) setTimeout(() => act(i), W.reduce ? 0 : i * 220); }); };
+render();
+let seen = false;
+W.view(document.body, on => {
+  if (!on || seen) return;
+  seen = true;
+  setTimeout(() => { if (auto && !IT[0].done) act(0); }, 1600);
+  setTimeout(() => { if (auto) { sel = 2; render(); } }, 4200);
+});
+</script>
+</body></html>

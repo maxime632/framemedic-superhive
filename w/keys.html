@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<link rel="icon" href="data:,"><title>Frame Medic · What stays as you built it</title>
+<link rel="stylesheet" href="w.css">
+<style>
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.key{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--s1);border:1px solid var(--line);border-bottom:4px solid #0a0a0a;
+ min-height:66px;padding:8px 6px;transition:transform .12s,background .2s,border-color .2s}
+.key kbd{font:700 16px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.04em;color:#fff}
+.key span{font-size:12px;color:var(--mute)}
+.key:hover{background:var(--s2)}
+.key.sel{border-color:var(--lime);border-bottom-color:#7f9d00;background:#1d2410}
+.key.sel span{color:var(--lime)}
+.key.down{transform:translateY(3px)}
+.stage{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:16px;min-height:34px}
+.st{font:700 11.5px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.05em;color:var(--mute);background:var(--s1);padding:9px 10px 8px;opacity:.35;transition:opacity .3s,background .3s,color .3s}
+.st.on{opacity:1;color:#141414;background:var(--lime)}
+.st.pk.on{background:var(--pink);color:#fff}
+.st.past{opacity:1;color:var(--soft)}
+.ar{color:var(--mute);font-size:12px}
+.w{justify-content:center}
+.say{margin-top:14px;font-size:15px;line-height:1.45;color:var(--soft);min-height:44px}
+.say b{color:#fff}
+@media (max-width:559px){
+ .keys{grid-template-columns:1fr 1fr;gap:6px}
+ .key{min-height:50px;flex-direction:row;gap:10px}
+ .key kbd{font-size:14px}.key span{font-size:11.5px}
+ .stage{margin-top:10px;gap:5px}.st{font-size:10.5px;padding:7px 8px 6px}
+ .say{font-size:13px}
+}
+</style></head>
+<body>
+<div class="w" id="w">
+  <div class="keys">
+    <button class="key" data-k="0"><kbd>F12</kbd><span>Render</span></button>
+    <button class="key" data-k="1"><kbd>Ctrl S</kbd><span>Save</span></button>
+    <button class="key" data-k="2"><kbd>Space</kbd><span>Play</span></button>
+    <button class="key" data-k="3"><kbd>Ctrl Z</kbd><span>Undo</span></button>
+  </div>
+  <div class="stage" id="stage" aria-live="polite"></div>
+  <p class="say" id="say"></p>
+</div>
+<script src="w.js"></script>
+<script>
+// each key: what happens, in order (pk = Frame Medic steps aside), then what it means for you
+const K = [
+  {s: [['RELIEF ON', 0], ['STEPS ASIDE', 1], ['FULL QUALITY RENDER', 0], ['RELIEF BACK', 0]],
+   t: 'Your <b>renders</b> use the full scene, with every setting you made.'},
+  {s: [['RELIEF ON', 0], ['LIFTED', 1], ['SAVED AS YOU MADE IT', 0], ['RELIEF BACK', 0]],
+   t: 'Your <b>file</b> never keeps anything Relief changed.'},
+  {s: [['PLAYING', 0], ['RIGS WHOLE', 0], ['SIMULATIONS SIMULATE', 0]],
+   t: 'Your <b>characters</b> deform as rigged. Cloth, soft bodies and simulation nodes keep simulating.'},
+  {s: [['UNDO', 0], ['FIX UNDONE', 0], ['PAUSE GIVES IT ALL BACK', 1]],
+   t: 'Every fix can be undone, and <b>one click on Pause</b> gives the scene back exactly as you made it.'}
+];
+const $ = id => document.getElementById(id), keys = [...document.querySelectorAll('.key')];
+let timers = [], auto = true;
+function press(i) {
+  timers.forEach(clearTimeout); timers = [];
+  keys.forEach((k, j) => k.classList.toggle('sel', j === i));
+  keys[i].classList.add('down'); setTimeout(() => keys[i].classList.remove('down'), 140);
+  $('stage').innerHTML = K[i].s.map((s, j) => (j ? '<span class="ar">→</span>' : '') + `<span class="st${s[1] ? ' pk' : ''}">${s[0]}</span>`).join('');
+  $('say').innerHTML = '';
+  const st = [...document.querySelectorAll('.st')];
+  st.forEach((el, j) => timers.push(setTimeout(() => {
+    st.forEach((o, n) => { o.classList.toggle('on', n === j); o.classList.toggle('past', n < j); });
+  }, W.reduce ? 0 : 120 + j * 480)));
+  timers.push(setTimeout(() => { $('say').innerHTML = K[i].t; }, W.reduce ? 0 : 120 + st.length * 480));
+}
+keys.forEach(k => k.onclick = () => { auto = false; press(+k.dataset.k); });
+let seen = false;
+W.view(document.body, v => {
+  if (!v || seen) return;
+  seen = true;
+  let i = 0;
+  const go = () => { if (!auto) return; press(i); i++; if (i < K.length) setTimeout(go, 3400); };
+  setTimeout(go, 600);
+});
+</script>
+</body></html>

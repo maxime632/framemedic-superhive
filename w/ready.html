@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<link rel="icon" href="data:,"><title>Frame Medic · Ready Frames</title>
+<link rel="stylesheet" href="w.css">
+<style>
+.w{flex-direction:row}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sw{display:flex;align-items:center;gap:10px;font:700 12px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.06em;background:var(--s2);padding:0 12px;min-height:40px}
+.sw i{position:relative;width:36px;height:18px;background:var(--s3);transition:background .25s}
+.sw i::after{content:"";position:absolute;left:3px;top:3px;width:12px;height:12px;background:var(--soft);transition:transform .25s var(--e),background .25s}
+.on .sw{background:var(--pink);color:#fff}
+.on .sw i{background:rgba(255,255,255,.3)}.on .sw i::after{transform:translateX(18px);background:#fff}
+.state{font-size:12px;color:var(--soft);margin-left:4px}
+.strip{position:relative;display:flex;gap:2px;height:22px;margin:14px 0 4px}
+.strip i{flex:1;background:var(--s2);transition:background .2s}
+.strip i.c{background:var(--pink)}
+.head{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--lime);left:0;opacity:0}
+.cap{font-size:11px;color:var(--mute);margin-bottom:10px}
+.bars{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.b{display:flex;align-items:center;gap:10px}
+.b span{flex:none;width:110px;font-size:13px;color:var(--soft)}
+.b .t{flex:1;height:14px;background:var(--s2)}
+.b .t i{display:block;height:100%;width:0;transition:width 1s var(--e)}
+.a i{background:var(--pink)}.h i{background:#fff}.mem i{background:var(--lime)}
+.b b{flex:none;width:58px;text-align:right;font:700 15px/1 SM,"Space Mono",Menlo,monospace}
+.mem b{color:var(--lime)}
+.mem b,.mem span{opacity:.35;transition:opacity .4s}.played .mem b,.played .mem span{opacity:1}
+.shot{flex:none;width:250px;margin-left:18px;display:flex;flex-direction:column;justify-content:center}
+.shot img{display:block;width:100%;height:auto;border:1px solid var(--line)}
+@media (max-width:639px){.shot{display:none}}
+@media (max-width:559px){
+ .sw,.cta{min-height:36px}.cta{padding:10px 12px 9px;font-size:12px}
+ .state{flex-basis:100%;margin:2px 0 0}
+ .strip{height:18px;margin:10px 0 4px}
+ .b span{width:86px;font-size:11.5px}.b b{width:46px;font-size:13px}.b .t{height:11px}
+ .bars{gap:6px}
+}
+</style></head>
+<body>
+<div class="w" id="w">
+  <div class="main">
+    <div class="ctl">
+      <button class="sw" id="sw" aria-pressed="false">READY FRAMES <i></i></button>
+      <button class="cta" id="play" disabled>▶ PLAY</button>
+      <span class="state m" id="state">OFF</span>
+    </div>
+    <div class="strip" id="strip"><span class="head" id="head"></span></div>
+    <p class="cap m">FRAMES KEPT WHILE BLENDER IS IDLE</p>
+    <div class="bars">
+      <div class="b a"><span>Blender alone</span><div class="t"><i data-w="6.3"></i></div><b>1.5</b></div>
+      <div class="b h"><span>After Heal</span><div class="t"><i data-w="41.7"></i></div><b>10</b></div>
+      <div class="b mem"><span>From memory</span><div class="t"><i data-w="87.5"></i></div><b>20-22</b></div>
+    </div>
+  </div>
+  <div class="shot"><img src="../media/ui/ready-top.png" width="502" height="300" alt="The Ready Frames section of the Frame Medic panel, on, with its cache full"></div>
+</div>
+<script src="w.js"></script>
+<script>
+// Blender Studio 020_0030 (2,475 objects, 561 frames) on a MacBook Pro M3: 1.5 fps alone, 9.7-10 after Heal, 20-22 from memory (fps of 24)
+const $ = id => document.getElementById(id), w = $('w');
+const N = innerWidth < 560 ? 26 : 40;
+for (let i = 0; i < N; i++) $('strip').insertAdjacentHTML('beforeend', '<i></i>');
+const cells = [...document.querySelectorAll('.strip i')];
+let on = false, filled = false, timers = [], auto = true;
+const later = (f, ms) => timers.push(setTimeout(f, W.reduce ? 0 : ms));
+const bar = (sel, show) => { const i = document.querySelector(sel + ' i'); i.style.width = show ? i.dataset.w + '%' : '0'; };
+function setOn(v) {
+  timers.forEach(clearTimeout); timers = [];
+  on = v; w.classList.toggle('on', v); w.classList.remove('played'); $('sw').setAttribute('aria-pressed', v);
+  cells.forEach(c => c.classList.remove('c')); filled = false; $('play').disabled = true; $('head').style.opacity = 0; bar('.mem', false);
+  if (!v) { $('state').textContent = 'OFF'; return; }
+  $('state').textContent = 'KEEPING FRAMES…';
+  cells.forEach((c, i) => later(() => c.classList.add('c'), 80 + i * 45));
+  later(() => { filled = true; $('play').disabled = false; $('state').textContent = 'READY · 892 MB'; if (auto) play(); }, 80 + N * 45);
+}
+function play() {
+  if (!filled) return;
+  w.classList.add('played'); bar('.mem', true); $('state').textContent = 'PLAYING FROM MEMORY';
+  const h = $('head'), t0 = performance.now(), dur = W.reduce ? 1 : 2400; h.style.opacity = 1;
+  const step = now => { const t = Math.min(1, (now - t0) / dur); h.style.left = `calc(${t * 100}% - 2px)`;
+    if (t < 1) requestAnimationFrame(step); else { $('state').textContent = 'READY · 892 MB'; h.style.opacity = 0; } };
+  requestAnimationFrame(step);
+}
+$('sw').onclick = () => { auto = false; setOn(!on); };
+$('play').onclick = () => { auto = false; play(); };
+let seen = false;
+W.view(w, v => {
+  if (!v || seen) return;
+  seen = true; bar('.a', true); bar('.h', true);
+  setTimeout(() => { if (auto && !on) setOn(true); }, 1100);
+});
+</script>
+</body></html>
