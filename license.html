@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Frame Medic · Which license?</title>
+<link rel="preload" href="fonts/Panchang-Extrabold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fm.css">
+<style>
+.panel{--h:41rem;padding:2.6rem}
+.h{margin-top:.8rem}
+.qs{display:flex;gap:2.4rem;margin-top:2rem}
+.q p{font:700 1.05rem/1 "SM",monospace;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;margin-bottom:.8rem}
+.q .seg{display:flex;gap:.4rem}
+.q button{font:700 1.3rem/1 "SG";color:var(--soft);background:rgba(255,255,255,.05);padding:1.1rem 1.4rem 1rem;
+ clip-path:polygon(.6rem 0,100% 0,100% calc(100% - .6rem),calc(100% - .6rem) 100%,0 100%,0 .6rem);transition:background .2s,color .2s}
+.q button:hover{color:#fff;background:rgba(255,255,255,.1)}
+.q button[aria-pressed=true]{background:#fff;color:var(--ink)}
+.cards{display:flex;gap:1.2rem;margin-top:2.2rem}
+.card{flex:1;position:relative;background:var(--s1);padding:1.8rem 1.8rem 1.6rem;border-top:.4rem solid var(--s3);opacity:.45;transform:scale(.98);
+ transition:opacity .35s var(--ease),transform .45s var(--spring),border-color .3s,background .3s;
+ clip-path:polygon(0 0,100% 0,100% calc(100% - 1.2rem),calc(100% - 1.2rem) 100%,0 100%)}
+.card.pick{opacity:1;transform:translateY(-.4rem);background:#2a2a2a}
+.card.pick.c1{border-color:var(--pink)}.card.pick.c2{border-color:var(--lime)}.card.pick.c3{border-color:#9d6bff}
+.card .who{font:700 1rem/1.2 "SM",monospace;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
+.card h3{font:800 2.4rem/1 "Panchang";text-transform:uppercase;margin:.8rem 0 1.2rem}
+.card li{list-style:none;font-size:1.3rem;line-height:1.45;color:#dedede;margin:.4rem 0;padding-left:1.6rem;position:relative}
+.card li::before{content:"+";position:absolute;left:0;color:var(--lime);font-weight:700}
+.flag{position:absolute;right:1.4rem;top:1.4rem;font:700 1rem/1 "SM",monospace;letter-spacing:.08em;background:var(--lime);color:var(--ink);padding:.5rem .6rem .4rem;opacity:0;transform:scale(.6);transition:all .4s var(--spring)}
+.card.pick .flag{opacity:1;transform:none}
+.foot{margin-top:1.6rem}
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <p class="lbl reveal">Which license? Two questions</p>
+  <h1 class="h reveal d1">Same add-on, <span class="hl">same features.</span></h1>
+  <div class="qs reveal d2">
+    <div class="q"><p>Who uses it?</p><div class="seg" data-q="who"><button aria-pressed="true" data-v="me">Just me</button><button aria-pressed="false" data-v="team">A team, up to 10</button></div></div>
+    <div class="q"><p>Is someone paying for the work?</p><div class="seg" data-q="paid"><button aria-pressed="false" data-v="no">No</button><button aria-pressed="true" data-v="yes">Yes</button></div></div>
+  </div>
+  <div class="cards reveal d3">
+    <div class="card c1" data-l="personal"><span class="flag">Yours</span><p class="who">1 person · non-commercial</p><h3>Personal</h3><ul><li>Up to 3 of your own computers</li><li>Personal projects, learning, portfolio</li></ul></div>
+    <div class="card c2" data-l="pro"><span class="flag">Yours</span><p class="who">1 person · any work</p><h3>Pro</h3><ul><li>Freelance, client projects, your job</li><li>Up to 3 computers</li><li>Priority support</li></ul></div>
+    <div class="card c3" data-l="studio"><span class="flag">Yours</span><p class="who">Up to 10 people</p><h3>Studio</h3><ul><li>One company or school, all its computers</li><li>Render nodes free</li><li>Priority support, help to deploy</li></ul></div>
+  </div>
+  <p class="foot">Every license: every feature and every 1.x update. More than ten people: support@framemedic.com.</p>
+</div>
+<script src="assets/fm.js"></script>
+<script>
+const st = {who: 'me', paid: 'yes'};
+function pick() {
+  const l = st.who === 'team' ? 'studio' : st.paid === 'yes' ? 'pro' : 'personal';
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('pick', c.dataset.l === l));
+}
+document.querySelectorAll('.seg').forEach(seg => seg.querySelectorAll('button').forEach(b => b.onclick = () => {
+  seg.querySelectorAll('button').forEach(o => o.setAttribute('aria-pressed', o === b));
+  st[seg.dataset.q] = b.dataset.v; pick();
+}));
+FM.onView(document.getElementById('p'), () => { document.getElementById('p').classList.add('in'); setTimeout(pick, 500); });
+</script>
+</body>
+</html>

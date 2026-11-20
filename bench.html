@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Frame Medic · Measured on real shots</title>
+<link rel="preload" href="fonts/Panchang-Extrabold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fm.css">
+<style>
+.panel{--h:76rem;padding:2.6rem 2.6rem 2rem}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem}
+.head .h{margin-top:.8rem;font-size:2.9rem}
+.big{display:flex;gap:1rem;margin-top:1.8rem}
+.stat{flex:1;background:var(--s1);padding:1.4rem 1.6rem 1.5rem;clip-path:polygon(1rem 0,100% 0,100% calc(100% - 1rem),calc(100% - 1rem) 100%,0 100%,0 1rem)}
+.stat b{display:block;font:700 4.2rem/1 "SM",monospace;letter-spacing:-.02em;color:var(--lime)}
+.stat b small{font-size:1.6rem;color:var(--mute);margin-left:.4rem}
+.stat b .from{color:var(--pink);font-size:2.4rem}
+.stat b .ar{color:var(--s3);font-size:2.4rem;margin:0 .4rem}
+.stat>span{display:block;margin-top:.8rem;font-size:1.25rem;line-height:1.4;color:var(--soft)}
+.seg{display:flex;gap:.4rem;margin-top:2rem}
+.seg button{white-space:nowrap;font:700 1.1rem/1 "SM",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);background:rgba(255,255,255,.05);padding:1rem 1.2rem .9rem;
+ clip-path:polygon(.6rem 0,100% 0,100% calc(100% - .6rem),calc(100% - .6rem) 100%,0 100%,0 .6rem)}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink)}
+.legend{margin-left:auto;white-space:nowrap;display:flex;gap:1.2rem;align-items:center;font:700 1rem/1 "SM",monospace;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
+.legend i{display:inline-block;width:1rem;height:1rem;margin-right:.5rem;vertical-align:-.1rem}
+.rows{margin-top:1rem;position:relative}
+.row{display:grid;grid-template-columns:23rem 1fr 15rem;align-items:center;gap:1.6rem;padding:.75rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.07);cursor:default;
+ transition:background .2s;opacity:0;transform:translateX(-1rem)}
+.row.show{opacity:1;transform:none;transition:opacity .45s var(--ease),transform .45s var(--ease),background .2s}
+.row:hover,.row.sel{background:rgba(255,255,255,.05)}
+.nm b{display:block;font:700 1.4rem/1.2 "SG"}
+.nm span{display:block;font:700 .95rem/1.3 "SM",monospace;letter-spacing:.06em;color:var(--mute);text-transform:uppercase;margin-top:.3rem}
+.nm .mem{color:#9d6bff;font-style:normal}
+.bars{position:relative}
+.bar{height:.9rem;background:#2B2B2B;margin:.3rem 0;position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width 1.1s var(--ease)}
+.bar.a i{background:var(--pink)}.bar.b i{background:var(--lime)}.bar.m i{background:#e8e8e8}
+.tgt{position:absolute;top:-.4rem;bottom:-.4rem;width:.2rem;background:rgba(255,255,255,.35)}
+.val{text-align:right;font-weight:700;font-family:"SM",monospace;white-space:nowrap}
+.val .f{color:var(--pink);font-size:1.4rem}.val .ar{color:var(--s3);font-size:1.4rem;margin:0 .3rem}.val .t{color:var(--lime);font-size:2.2rem}
+.val .x{display:inline-block;margin-left:.6rem;font-size:1.1rem;color:var(--ink);background:var(--lime);padding:.3rem .45rem .2rem;vertical-align:.25rem}
+.say{margin-top:1.2rem;min-height:4.4rem;font-size:1.35rem;line-height:1.5;color:#e6e6e6;padding:1.1rem 1.4rem;background:var(--s1);border-left:.3rem solid var(--lime)}
+.say b{color:#fff}
+.foot{margin-top:1rem}
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <div class="head">
+    <div>
+      <p class="lbl reveal">Measured on real shots · Blender Studio production files</p>
+      <h1 class="h reveal d1">Real playback, <span class="hl">not estimates.</span></h1>
+    </div>
+  </div>
+  <div class="big">
+    <div class="stat reveal d1"><b><span class="from">2.1</span><span class="ar">→</span><span data-c="24">24</span><small>fps</small></b><span>Wing It! 020_0100, 1,633 objects. The 24 fps the shot asks for.</span></div>
+    <div class="stat reveal d2"><b>×<span data-c="34">34</span></b><span>Singularity 060_0010 lighting: 0.6 fps alone, 20.7 after Heal.</span></div>
+    <div class="stat reveal d3"><b><span data-c="60">60</span><small>fps</small></b><span>From memory: 6 characters, 1.08 million moving vertices. 10.4 alone.</span></div>
+  </div>
+  <div class="seg reveal d3" role="group" aria-label="Machine">
+    <button aria-pressed="true" data-m="mac">MacBook Pro M3</button>
+    <button aria-pressed="false" data-m="win">Windows · RTX 4070 SUPER</button>
+    <span class="legend"><span><i style="background:var(--pink)"></i>Blender alone</span><span><i style="background:var(--lime)"></i>With Frame Medic</span><span><i style="background:#e8e8e8"></i>Heal only</span></span>
+  </div>
+  <div class="rows" id="rows"></div>
+  <p class="say" id="say">Point at a shot to read it in full.</p>
+  <p class="foot" id="ft">Real playback, every frame played, Solid view · MacBook Pro M3 16 GB, Blender 5.2.1 · "from memory": Heal, then Ready Frames turned on · shots by Blender Studio (studio.blender.org), CC BY</p>
+</div>
+<script src="assets/fm.js"></script>
+<script>
+// a = Blender alone, h = after Heal, m = from memory (Heal + Ready Frames), ask = rate the shot asks for
+const DATA = {
+  mac: [
+    {n: 'Wing It! 020_0100', s: 'Lighting · 1,633 objects', a: 2.1, h: 24.0, ask: 24},
+    {n: 'Singularity 060_0010', s: 'Animation', a: 3.9, h: 23.9, ask: 24},
+    {n: 'Singularity 060_0010', s: 'Lighting', a: 0.6, h: 20.7, ask: 24},
+    {n: 'Singularity 020_0030', s: 'Animation · 61 frames', a: 1.9, h: 20.2, ask: 24},
+    {n: 'Singularity 020_0030', s: 'Lighting · 2,475 objects', a: 1.5, h: 10, m: 20, mt: '20-22', ask: 24, mem: true},
+    {n: 'Wing It! 070_0030', s: 'Lighting · 1,950 objects', a: 0.7, h: 12.3, ask: 24},
+    {n: 'Six characters', s: '1.08 M moving vertices · 60 fps asked', a: 10.4, m: 60, mt: '60', ask: 60, mem: true}
+  ],
+  win: [
+    {n: 'Singularity 100_0040', s: 'Lighting · Heal This Scene', a: 0.41, h: 14.49, ask: 24},
+    {n: 'Charge', s: 'Blender 3.4 splash · Heal This Scene', a: 1.3, h: 17.7, ask: 24}
+  ]
+};
+const $ = id => document.getElementById(id);
+const FOOT = {mac: document.getElementById('ft').textContent, win: 'Real playback, Solid view · Windows 11, RTX 4070 SUPER, Ryzen 9 5950X, Blender 5.0.1 · measured over the whole shot · shots by Blender Studio (studio.blender.org), CC BY'};
+let mach = 'mac', shown = false;
+const fmt = v => String(v % 1 ? v : v.toFixed(1));
+function best(r) { return r.m ?? r.h; }
+function build() {
+  const box = $('rows'); box.innerHTML = '';
+  DATA[mach].forEach((r, i) => {
+    const el = document.createElement('div'); el.className = 'row'; el.tabIndex = 0;
+    const b = best(r), x = b / r.a;
+    el.innerHTML = `<div class="nm"><b>${r.n}</b><span>${r.s}${r.mem ? ' · <em class="mem">from memory</em>' : ''}</span></div>
+      <div class="bars"><div class="bar a"><i data-w="${r.a / r.ask * 100}"></i></div>${r.h && r.m ? `<div class="bar m"><i data-w="${r.h / r.ask * 100}"></i></div>` : ''}
+      <div class="bar b"><i data-w="${b / r.ask * 100}"></i></div><span class="tgt" style="left:calc(100% - .1rem)"></span></div>
+      <div class="val"><span class="f">${fmt(r.a)}</span><span class="ar">→</span><span class="t">${r.mt || fmt(b)}</span><span class="x">×${x >= 10 ? Math.floor(x) : (Math.floor(x * 10) / 10).toFixed(1)}</span></div>`;
+    const say = () => {
+      [...box.children].forEach(c => c.classList.toggle('sel', c === el));
+      $('say').innerHTML = `<b>${r.n}</b>, ${r.s.toLowerCase()}: Blender alone plays it at <b>${fmt(r.a)} fps</b>` +
+        (r.h ? `, <b>${fmt(r.h)} fps</b> after Heal This Scene` : '') + (r.m ? `, <b>${r.mt} fps</b> from memory with Ready Frames` : '') +
+        `. The shot asks for ${r.ask} fps.`;
+    };
+    el.addEventListener('mouseenter', say); el.addEventListener('focus', say); el.addEventListener('click', say);
+    box.appendChild(el);
+    setTimeout(() => {
+      el.classList.add('show');
+      el.querySelectorAll('.bar i').forEach(i => { i.style.width = Math.min(100, +i.dataset.w) + '%'; });
+    }, 120 + i * 90);
+  });
+}
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.seg button').forEach(o => o.setAttribute('aria-pressed', o === b));
+  mach = b.dataset.m; build(); $('say').textContent = 'Point at a shot to read it in full.';
+  $('ft').textContent = mach === 'mac' ? FOOT.mac : FOOT.win;
+});
+FM.onView($('p'), () => {
+  $('p').classList.add('in');
+  document.querySelectorAll('[data-c]').forEach(el => FM.count(el, 0, +el.dataset.c, 1400, 0));
+  build();
+});
+</script>
+</body>
+</html>

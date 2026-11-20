@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Frame Medic · Blender alone vs Heal This Scene</title>
+<link rel="preload" href="fonts/Panchang-Extrabold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fm.css">
+<style>
+.panel{--h:86rem;padding:2.4rem}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem}
+.top .h{margin-top:.8rem;font-size:2.5rem}
+.tabs{display:flex;gap:.6rem;margin-top:1.6rem}
+.tab{font:700 1.1rem/1 "SM",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);background:rgba(255,255,255,.05);padding:1rem 1.2rem .9rem;
+ clip-path:polygon(.6rem 0,100% 0,100% calc(100% - .6rem),calc(100% - .6rem) 100%,0 100%,0 .6rem);transition:background .2s,color .2s}
+.tab:hover{background:rgba(255,255,255,.1);color:#fff}
+.tab[aria-selected=true]{background:#fff;color:var(--ink)}
+.labels{display:flex;justify-content:space-between;align-items:flex-end;margin-top:1.4rem;height:4.4rem}
+.lab{display:flex;align-items:flex-end;gap:1rem}
+.lab .n{font:700 3.4rem/1 "SM",monospace;letter-spacing:-.02em}
+.lab .u{font:700 1.2rem/1 "SM",monospace;color:var(--mute);margin-bottom:.35rem}
+.lab .x{font:700 1.4rem/1 "SM",monospace;color:var(--ink);background:var(--lime);padding:.5rem .7rem .4rem;margin-bottom:.1rem;transform:scale(0);transition:transform .5s var(--spring)}
+.healed .lab .x{transform:none}
+.lab.r{justify-content:flex-end;text-align:right}
+.lab.a .n{color:var(--pink)}.lab.r .n{color:var(--lime)}
+.lab.r .n,.lab.r .u{transition:opacity .4s}
+.panel:not(.healed) .lab.r .n,.panel:not(.healed) .lab.r .u{opacity:.25}
+.stage{position:relative;margin-top:.8rem;width:78.4rem;height:54.9rem;background:#000;overflow:hidden;cursor:ew-resize;touch-action:pan-y;
+ clip-path:polygon(1.2rem 0,100% 0,100% calc(100% - 1.2rem),calc(100% - 1.2rem) 100%,0 100%,0 1.2rem)}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.alone{position:absolute;inset:0;will-change:clip-path}
+.div{position:absolute;top:0;bottom:0;width:0;z-index:5;pointer-events:none}
+.div::before{content:"";position:absolute;top:0;bottom:0;left:-.15rem;width:.3rem;background:var(--lime);box-shadow:0 0 1.6rem rgba(206,255,5,.6)}
+.knob{position:absolute;top:50%;left:-2.4rem;width:4.8rem;height:4.8rem;margin-top:-2.4rem;background:var(--lime);color:var(--ink);pointer-events:auto;cursor:ew-resize;
+ display:flex;align-items:center;justify-content:center;clip-path:polygon(.9rem 0,100% 0,100% calc(100% - .9rem),calc(100% - .9rem) 100%,0 100%,0 .9rem);transition:transform .25s var(--spring)}
+.knob:hover,.dragging .knob{transform:scale(1.08)}
+.knob svg{width:2.6rem;height:2.6rem}
+.knob:focus-visible{outline:.3rem solid #fff;outline-offset:.3rem}
+.tagA,.tagB{position:absolute;bottom:1.4rem;z-index:4;pointer-events:none;transition:opacity .3s}
+.tagA{left:1.4rem}.tagB{right:1.4rem}
+.panel:not(.healed) .tagB{opacity:0}
+.intro{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;
+ background:linear-gradient(180deg,rgba(28,28,28,0) 30%,rgba(28,28,28,.55));transition:opacity .4s}
+.intro p{font:700 1.1rem/1.4 "SM",monospace;letter-spacing:.08em;text-transform:uppercase;color:#fff;text-shadow:0 .1rem .6rem #000}
+.healed .intro{opacity:0;pointer-events:none}
+.scan{position:absolute;top:0;bottom:0;width:14rem;z-index:6;pointer-events:none;opacity:0;
+ background:linear-gradient(90deg,rgba(206,255,5,0),rgba(206,255,5,.35) 70%,rgba(206,255,5,.9));mix-blend-mode:screen}
+.hint{position:absolute;top:50%;z-index:7;transform:translate(3.4rem,-50%);font:700 1.1rem/1 "SM",monospace;letter-spacing:.1em;color:var(--ink);background:#fff;padding:.7rem .9rem .6rem;
+ opacity:0;transition:opacity .4s;pointer-events:none;white-space:nowrap}
+.hint.on{opacity:1}
+.ctrl{display:flex;align-items:center;gap:1.4rem;margin-top:1.2rem}
+.play{width:4rem;height:4rem;background:var(--s2);display:flex;align-items:center;justify-content:center;clip-path:polygon(.7rem 0,100% 0,100% calc(100% - .7rem),calc(100% - .7rem) 100%,0 100%,0 .7rem)}
+.play:hover{background:var(--s3)}
+.play svg{width:1.6rem;height:1.6rem}
+.time{flex:1;display:flex;align-items:center;gap:1.2rem}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:.6rem;background:var(--s2);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1.4rem;height:1.8rem;background:var(--lime);border:0}
+input[type=range]::-moz-range-thumb{width:1.4rem;height:1.8rem;background:var(--lime);border:0;border-radius:0}
+.tc{font:700 1.1rem/1 "SM",monospace;color:var(--soft);min-width:9rem}
+.again{font:700 1.1rem/1 "SM",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);padding:1rem 1.2rem .9rem;background:rgba(255,255,255,.05)}
+.again:hover{color:#fff;background:rgba(255,255,255,.1)}
+.foot{margin-top:1rem}
+.mach{text-align:right}
+.mach .chip{margin-top:.4rem}
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <div class="top">
+    <div>
+      <p class="lbl reveal">See it for yourself · real screen recordings</p>
+      <h1 class="h reveal d1">Blender alone vs <span class="hl">Heal This Scene</span></h1>
+    </div>
+  </div>
+  <div class="tabs reveal d2" role="tablist" id="tabs"></div>
+  <div class="labels">
+    <div class="lab a"><span class="chip pink">Blender alone</span><span class="n" id="nA">0.41</span><span class="u">fps</span></div>
+    <div class="lab r"><span class="x" id="nX">×35</span><span class="n" id="nB">14.49</span><span class="u">fps</span><span class="chip lime">After Heal This Scene</span></div>
+  </div>
+  <div class="stage" id="stage">
+    <video id="vB" muted playsinline loop preload="auto" aria-label="After Heal This Scene"></video>
+    <div class="alone" id="wrapA"><video id="vA" muted playsinline loop preload="auto" aria-label="Blender alone"></video></div>
+    <div class="scan" id="scan"></div>
+    <div class="div" id="div"><span class="knob" id="knob" tabindex="0" role="slider" aria-label="Move the divider between Blender alone and after Heal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M9 6 2 13l7 7M17 6l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3.2"/></svg></span>
+      <span class="hint" id="hint">Drag to compare</span></div>
+    <div class="intro" id="intro">
+      <button class="pbtn pulse" id="heal" data-g="Heal This Scene"><svg class="px" viewBox="0 0 3 3" aria-hidden="true"><path fill="currentColor" d="M1 0h1v1h1v1H2v1H1V2H0V1h1z"/></svg>Heal This Scene</button>
+      <p id="introNote">Press it. Same shot, same camera, Solid view.</p>
+    </div>
+  </div>
+  <div class="ctrl">
+    <button class="play" id="play" aria-label="Pause"><svg viewBox="0 0 16 16" aria-hidden="true" id="playIco"><path fill="currentColor" d="M3 2h4v12H3zM9 2h4v12H9z"/></svg></button>
+    <div class="time"><input type="range" id="seek" min="0" max="8" step="0.01" value="0" aria-label="Time"><span class="tc" id="tc">00.0 / 08.0 s</span></div>
+    <button class="again" id="again">↻ Heal again</button>
+  </div>
+  <p class="foot" id="foot">Screen recordings of Blender's viewport at their real speed · Windows · RTX 4070 SUPER · Blender 5.0.1 · frame rates measured over the whole shot · shots by Blender Studio, CC BY</p>
+</div>
+<script src="assets/fm.js"></script>
+<script>
+const SHOTS = [
+  {id: 'sing-cam', tab: 'Singularity · camera', a: 0.41, b: 14.49, file: 'sing-cam'},
+  {id: 'sing-orbit', tab: 'Singularity · orbit', a: 0.41, b: 14.49, file: 'sing-orbit'},
+  {id: 'charge-cam', tab: 'Charge · camera', a: 1.3, b: 17.7, file: 'charge-cam'},
+  {id: 'charge-orbit', tab: 'Charge · orbit', a: 1.3, b: 17.7, file: 'charge-orbit'}
+];
+const $ = id => document.getElementById(id);
+const P = $('p'), stage = $('stage'), vA = $('vA'), vB = $('vB'), wrapA = $('wrapA'), div = $('div'), knob = $('knob');
+let pos = 1, healed = false, cur = 0, dragging = false, playing = true, anim = null;
+
+function setPos(p) {
+  pos = Math.max(0, Math.min(1, p));
+  wrapA.style.clipPath = `inset(0 ${((1 - pos) * 100).toFixed(3)}% 0 0)`;
+  div.style.left = (pos * 100) + '%';
+  knob.setAttribute('aria-valuenow', Math.round(pos * 100));
+}
+function nums(s, animate) {
+  $('nA').textContent = s.a.toFixed(s.a < 1 ? 2 : 1);
+  const x = s.b / s.a;
+  $('nX').textContent = '×' + (x >= 10 ? Math.floor(x) : (Math.floor(x * 10) / 10).toFixed(1));
+  if (animate) FM.count($('nB'), s.a, s.b, 1300, String(s.b).split('.')[1]?.length || 0);
+  else $('nB').textContent = s.b.toFixed(String(s.b).split('.')[1]?.length || 0);
+}
+function load(i, keep) {
+  cur = i; const s = SHOTS[i];
+  [...document.querySelectorAll('.tab')].forEach((t, k) => t.setAttribute('aria-selected', k === i));
+  vA.poster = `media/${s.file}-alone.jpg`; vB.poster = `media/${s.file}-heal.jpg`;
+  vA.src = `media/${s.file}-alone.mp4`; vB.src = `media/${s.file}-heal.mp4`;
+  vA.load(); vB.load();
+  nums(s, false);
+  if (playing) { vA.play().catch(() => {}); vB.play().catch(() => {}); }
+}
+SHOTS.forEach((s, i) => {
+  const b = document.createElement('button');
+  b.className = 'tab'; b.setAttribute('role', 'tab'); b.textContent = s.tab;
+  b.onclick = () => load(i, true);
+  $('tabs').appendChild(b);
+});
+
+// keep both videos on the same frame
+function tick() {
+  if (!vB.paused && vA.readyState > 1 && Math.abs(vA.currentTime - vB.currentTime) > 0.06) vA.currentTime = vB.currentTime;
+  if (!seeking) { $('seek').value = vB.currentTime; }
+  $('tc').textContent = vB.currentTime.toFixed(1).padStart(4, '0') + ' / ' + (vB.duration || 8).toFixed(1).padStart(4, '0') + ' s';
+  requestAnimationFrame(tick);
+}
+let seeking = false;
+$('seek').addEventListener('input', e => { seeking = true; vA.currentTime = vB.currentTime = +e.target.value; });
+$('seek').addEventListener('change', () => { seeking = false; });
+vB.addEventListener('loadedmetadata', () => { $('seek').max = vB.duration.toFixed(2); });
+
+function setPlaying(on) {
+  playing = on;
+  if (on) { vA.play().catch(() => {}); vB.play().catch(() => {}); } else { vA.pause(); vB.pause(); }
+  $('play').setAttribute('aria-label', on ? 'Pause' : 'Play');
+  $('playIco').innerHTML = on ? '<path fill="currentColor" d="M3 2h4v12H3zM9 2h4v12H9z"/>' : '<path fill="currentColor" d="M3 1l11 7-11 7z"/>';
+}
+$('play').onclick = () => setPlaying(!playing);
+
+function animTo(to, dur, cb) {
+  cancelAnimationFrame(anim);
+  const from = pos, t0 = performance.now();
+  const step = now => {
+    const t = Math.min(1, (now - t0) / dur), e = FM.ease(t);
+    setPos(from + (to - from) * e);
+    const sc = $('scan'); sc.style.opacity = t < 1 ? 1 : 0; sc.style.left = `calc(${pos * 100}% - 14rem)`;
+    if (t < 1) anim = requestAnimationFrame(step); else cb && cb();
+  };
+  anim = requestAnimationFrame(step);
+}
+function heal() {
+  if (healed) return;
+  healed = true; P.classList.add('healed');
+  const r = stage.getBoundingClientRect();
+  FM.burst(document.body, r.left + r.width / 2, r.top + r.height / 2, 14);
+  nums(SHOTS[cur], true);
+  animTo(0.5, FM.reduce ? 0 : 1400, () => { $('hint').classList.add('on'); setTimeout(() => $('hint').classList.remove('on'), 3200); });
+}
+$('heal').onclick = heal;
+$('again').onclick = () => { healed = false; P.classList.remove('healed'); cancelAnimationFrame(anim); setPos(1); setTimeout(heal, 700); };
+
+// drag anywhere on the stage once healed
+function fromEvent(e) { const r = stage.getBoundingClientRect(); return (e.clientX - r.left) / r.width; }
+stage.addEventListener('pointerdown', e => {
+  if (!healed || e.target.closest('#heal')) return;
+  dragging = true; P.classList.add('dragging'); stage.setPointerCapture(e.pointerId); cancelAnimationFrame(anim); setPos(fromEvent(e));
+});
+stage.addEventListener('pointermove', e => { if (dragging) setPos(fromEvent(e)); });
+['pointerup', 'pointercancel'].forEach(t => stage.addEventListener(t, () => { dragging = false; P.classList.remove('dragging'); }));
+knob.addEventListener('keydown', e => {
+  if (!healed && (e.key === 'Enter' || e.key === ' ')) { heal(); e.preventDefault(); return; }
+  const d = e.key === 'ArrowLeft' ? -0.05 : e.key === 'ArrowRight' ? 0.05 : e.key === 'Home' ? -1 : e.key === 'End' ? 1 : 0;
+  if (d) { if (!healed) heal(); cancelAnimationFrame(anim); setPos(pos + d); e.preventDefault(); }
+});
+
+setPos(1); load(0);
+requestAnimationFrame(tick);
+// start when the frame is on screen; heal by itself if nobody presses within a few seconds
+FM.onView(P, () => {
+  P.classList.add('in'); setPlaying(true);
+  setTimeout(() => { if (!healed) heal(); }, 4200);
+});
+</script>
+</body>
+</html>
