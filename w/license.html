@@ -1,62 +1,21 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<link rel="icon" href="data:,"><title>Frame Medic · Which license</title>
+<link rel="icon" href="data:,"><title>Frame Medic · Licenses</title>
 <link rel="stylesheet" href="w.css">
 <style>
-.qs{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
-.q p{font-size:13px;color:var(--soft);margin-bottom:6px}
-.seg{display:flex;gap:4px}
-.seg button{flex:1;font:700 12px/1.1 SM,"Space Mono",Menlo,monospace;letter-spacing:.05em;color:var(--soft);background:var(--s2);padding:8px 8px;min-height:38px}
-.seg button:hover{color:#fff}
-.seg button[aria-pressed=true]{background:#fff;color:#141414}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;flex:1}
-.card{position:relative;background:var(--s1);padding:14px 14px 12px;border-top:4px solid var(--c);opacity:.5;transition:opacity .3s,background .3s,transform .3s var(--e)}
-.card.pick{opacity:1;background:#232323;transform:translateY(-3px)}
-.card h3{font:700 18px/1.1 SG,"Space Grotesk",Inter,Arial,sans-serif}
-.card .who{font-size:11px;color:var(--mute);margin:4px 0 8px}
-.card ul{list-style:none;font-size:13px;line-height:1.4;color:var(--soft)}
-.card li+li{margin-top:3px}
-.flag{position:absolute;right:10px;top:10px;font:700 10px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.06em;color:#141414;background:var(--c);padding:5px 6px 4px;opacity:0;transition:opacity .3s}
-.pick .flag{opacity:1}
-.c1{--c:var(--pink)}.c2{--c:var(--lime)}.c3{--c:#8a4dff}
-.foot{font-size:11px;color:var(--mute);margin-top:10px}
-@media (max-width:559px){
- .qs{grid-template-columns:1fr;gap:8px}
- .q p{font-size:12px;margin-bottom:4px}.seg button{min-height:34px;font-size:11px;padding:6px}
- .cards{grid-template-columns:1fr;gap:5px;margin-top:10px}
- .card{padding:8px 10px;display:grid;grid-template-columns:76px 1fr;align-items:center;gap:0 8px;border-top:0;border-left:4px solid var(--c)}
- .card.pick{transform:none}
- .card h3{font-size:15px;grid-row:1 / 3}.card .who{margin:0;font-size:10.5px}
- .card ul{font-size:11.5px;line-height:1.3}.card li+li{display:none}
- .flag{top:50%;transform:translateY(-50%);right:8px}
- .foot{margin-top:6px;font-size:10px}
-}
+.w{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{border-top:4px solid var(--c)}
+.tile h3{font:700 19px/1.1 SG,"Space Grotesk",Inter,Arial,sans-serif}
+.tile .who{font-size:11px;color:var(--c);margin:6px 0 8px}
+.tile p{font-size:13px;line-height:1.45;color:var(--soft)}
+.c1{--c:var(--pink)}.c2{--c:var(--lime)}.c3{--c:#A57BFF}
+@media (max-width:559px){.w{grid-template-columns:1fr;gap:5px}.tile{padding:9px 12px;border-top:0;border-left:4px solid var(--c)}.tile h3{font-size:15px;display:inline}.tile .who{display:inline;margin-left:8px;font-size:10px}.tile p{font-size:12px;margin-top:3px}}
 </style></head>
 <body>
-<div class="w" id="w">
-  <div class="qs">
-    <div class="q"><p>Who uses it?</p><div class="seg" data-q="who"><button aria-pressed="true" data-v="me">JUST ME</button><button aria-pressed="false" data-v="team">A TEAM, UP TO 10</button></div></div>
-    <div class="q"><p>Is someone paying for the work?</p><div class="seg" data-q="paid"><button aria-pressed="false" data-v="no">NO</button><button aria-pressed="true" data-v="yes">YES</button></div></div>
-  </div>
-  <div class="cards">
-    <div class="card c1" data-l="personal"><span class="flag">YOURS</span><h3>Personal</h3><p class="who m">1 PERSON · NOT PAID WORK</p><ul><li>Up to 3 of your computers</li><li>Personal projects, learning, portfolio</li></ul></div>
-    <div class="card c2" data-l="pro"><span class="flag">YOURS</span><h3>Pro</h3><p class="who m">1 PERSON · ANY WORK</p><ul><li>Freelance, clients, your job</li><li>Up to 3 of your computers</li><li>Priority support</li></ul></div>
-    <div class="card c3" data-l="studio"><span class="flag">YOURS</span><h3>Studio</h3><p class="who m">UP TO 10 PEOPLE</p><ul><li>One company or school, all its computers</li><li>Priority support</li></ul></div>
-  </div>
-  <p class="foot m">SAME ADD-ON AND FEATURES IN ALL THREE · EVERY 1.X UPDATE INCLUDED</p>
+<header class="hd"><span class="no m">07</span><h2>SAME ADD-ON, <em>SAME FEATURES.</em></h2><p>Pick by how you work. Every 1.x update is included.</p></header>
+<div class="w">
+  <div class="tile c1"><h3>Personal</h3><p class="who m">JUST YOU · NOT PAID WORK</p><p>Personal projects, on up to 3 of your computers.</p></div>
+  <div class="tile c2"><h3>Pro</h3><p class="who m">JUST YOU · PAID WORK</p><p>Clients, freelance, your job. Up to 3 computers, priority support.</p></div>
+  <div class="tile c3"><h3>Studio</h3><p class="who m">A TEAM, UP TO 10</p><p>One company or school, all its computers, priority support.</p></div>
 </div>
-<script src="w.js"></script>
-<script>
-const st = {who: 'me', paid: 'yes'};
-function pick() {
-  const l = st.who === 'team' ? 'studio' : st.paid === 'yes' ? 'pro' : 'personal';
-  document.querySelectorAll('.card').forEach(c => c.classList.toggle('pick', c.dataset.l === l));
-  document.querySelector('[data-q="paid"]').closest('.q').style.opacity = st.who === 'team' ? .4 : 1;
-}
-document.querySelectorAll('.seg').forEach(seg => seg.querySelectorAll('button').forEach(b => b.onclick = () => {
-  seg.querySelectorAll('button').forEach(o => o.setAttribute('aria-pressed', o === b));
-  st[seg.dataset.q] = b.dataset.v; pick();
-}));
-pick();
-</script>
 </body></html>

@@ -1,3 +1,4 @@
+@font-face{font-family:Panchang;font-weight:800;font-display:swap;src:url(../fonts/Panchang-Extrabold.woff2) format("woff2")}
 @font-face{font-family:SG;font-weight:500;font-display:swap;src:url(../fonts/SpaceGrotesk-Medium.woff2) format("woff2")}
 @font-face{font-family:SG;font-weight:700;font-display:swap;src:url(../fonts/SpaceGrotesk-Bold.woff2) format("woff2")}
 @font-face{font-family:SM;font-weight:700;font-display:swap;src:url(../fonts/SpaceMono-Bold.woff2) format("woff2")}
@@ -11,8 +12,19 @@ button:focus-visible{outline:2px solid var(--lime);outline-offset:-2px}
 b,strong{font-weight:700}
 .m{font-family:SM,"Space Mono",Menlo,Consolas,monospace;font-weight:700;letter-spacing:.05em}
 .cut{clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
-.w{position:relative;height:100%;padding:22px 24px;display:flex;flex-direction:column;background:var(--bg);
- clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px)}
+body{display:flex;flex-direction:column;background:var(--bg)}
+.hd{position:relative;padding:20px 24px 0}
+.hd .no{display:inline-block;font-size:11px;color:#141414;background:var(--lime);padding:4px 7px 3px;margin-bottom:10px;
+ clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
+.hd h2{font:800 clamp(16px,3.3vw,25px)/1.12 Panchang,SG,sans-serif;text-transform:uppercase;letter-spacing:-.015em;color:#fff}
+.hd h2 em{font-style:normal;color:var(--lime)}
+.hd p{font-size:14px;line-height:1.45;color:var(--soft);margin-top:8px;max-width:620px}
+.hd::after{content:"";position:absolute;right:48px;top:22px;width:8px;height:8px;background:var(--pink);
+ box-shadow:12px 0 var(--lime),24px 12px var(--violet),12px 12px var(--pink),-12px 12px #333,24px -0px #333}
+.try{display:inline-block;font:700 11px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.06em;color:#fff;background:var(--pink);padding:6px 8px 5px;margin-top:10px;
+ clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
+.tile{background:var(--s1);padding:14px 14px;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.w{position:relative;flex:1;min-height:0;padding:16px 24px 22px;display:flex;flex-direction:column}
 /* brand: chiseled corners, never round */
 .cta,.ghost,.fx,.key,.stat,.card,.steps li,.r,.mod,.toast,.sw,.seg button,.view,.shot img,.read,.val,.st{
  clip-path:polygon(var(--k,6px) 0,100% 0,100% calc(100% - var(--k,6px)),calc(100% - var(--k,6px)) 100%,0 100%,0 var(--k,6px))}
@@ -26,5 +38,6 @@ b,strong{font-weight:700}
 .ghost:hover{color:#fff;background:var(--s3)}
 @keyframes pl{50%{filter:drop-shadow(0 0 10px rgba(206,255,5,.7))}}
 .pulse{display:inline-flex;animation:pl 1.8s ease-in-out infinite}
-@media (max-width:559px){.w{padding:14px}}
+@media (max-width:559px){.w{padding:12px 14px 14px}.hd{padding:14px 14px 0}.hd p{font-size:12.5px;margin-top:6px}.hd .no{margin-bottom:7px}.hd::after{right:38px;top:16px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (min-width:560px){.tile{display:flex;flex-direction:column;justify-content:center;padding:18px 20px}.tile p{font-size:15px!important}.tile h3{font-size:25px!important}.tile kbd{font-size:22px!important}.tile b{font-size:clamp(17px,3.3vw,28px)}.tile kbd+b{font-size:18px}}

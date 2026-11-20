@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<link rel="icon" href="data:,"><title>Frame Medic · Relief</title>
+<link rel="stylesheet" href="w.css">
+<style>
+.w{flex-direction:row;gap:16px}
+.l{flex:1.5;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.l img{display:block;width:100%;height:auto}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:11px;color:var(--soft);background:var(--s2);padding:7px 9px 6px;clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
+.chips span.on{background:var(--pink);color:#fff}
+.r{flex:1;min-width:0;display:flex}
+.r img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+@media (max-width:559px){.w{flex-direction:column;gap:10px}.l{flex:none;gap:8px}.r{flex:1;min-height:0}.chips span{font-size:10px;padding:6px 7px 5px}}
+</style></head>
+<body>
+<header class="hd"><span class="no m">02</span><h2>LIGHTER <em>WHILE YOU WORK.</em></h2><p>Relief lightens the viewport object by object. Pause it and the scene is exactly as you made it.</p></header>
+<div class="w">
+  <div class="l">
+    <img class="cut" src="../media/ui/readout.png" width="574" height="204" alt="The playback readout in the view: 20.5 frames per second for a 24 fps shot, with Relief on">
+    <div class="chips m"><span class="on">RELIEF ON</span><span>SUBDIVISION</span><span>TEXTURES</span><span>HAIR</span><span>MATERIAL PREVIEW</span><span>GREASE PENCIL</span><span>RIGS</span></div>
+  </div>
+  <div class="r"><img class="cut" src="../media/ui/relief.png" width="512" height="598" alt="The Relief section of the Frame Medic panel, on Auto"></div>
+</div>
+</body></html>
