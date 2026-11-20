@@ -5,138 +5,94 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:,">
-<title>Frame Medic · Press Heal This Scene</title>
+<title>Frame Medic · Heal This Scene</title>
 <link rel="preload" href="fonts/Panchang-Extrabold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fm.css">
 <style>
-.panel{--h:72.4rem;padding:2.6rem}
-.h{margin-top:.8rem}
-.main{display:flex;gap:1.8rem;margin-top:2rem;align-items:flex-start}
-.leftc{flex:0 0 46rem}
-.view{position:relative;width:46rem;height:32.2rem;background:#000;overflow:hidden;
+.panel{--h:46.8rem;padding:2.8rem}
+.main{display:flex;gap:2.4rem;margin-top:2.2rem;align-items:flex-start}
+.view{position:relative;flex:0 0 46rem;height:26.8rem;background:#000;overflow:hidden;
  clip-path:polygon(1.2rem 0,100% 0,100% calc(100% - 1.2rem),calc(100% - 1.2rem) 100%,0 100%,0 1.2rem)}
 .view video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s}
 #vH{opacity:0}.done #vH{opacity:1}
-.view .chip{position:absolute;left:1rem;top:1rem;z-index:3}
-.read{position:absolute;right:1rem;bottom:1rem;z-index:3;background:rgba(20,20,20,.86);padding:.9rem 1.1rem;min-width:15rem;
+.read{position:absolute;right:1rem;bottom:1rem;z-index:3;background:rgba(20,20,20,.88);padding:1rem 1.2rem;
  clip-path:polygon(.7rem 0,100% 0,100% calc(100% - .7rem),calc(100% - .7rem) 100%,0 100%,0 .7rem)}
-.read small{display:block;font:700 .95rem/1 "SM",monospace;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
-.read b{display:block;font:700 3rem/1.1 "SM",monospace;color:var(--pink);margin-top:.4rem;transition:color .4s}
-.read b small{display:inline;font-size:1.2rem;color:var(--mute);letter-spacing:0;margin-left:.3rem}
+.read b{display:block;font:700 3.4rem/1 "SM",monospace;color:var(--pink);transition:color .4s}
+.read b small{font-size:1.3rem;color:var(--mute);margin-left:.4rem}
 .done .read b{color:var(--lime)}
 .scanline{position:absolute;left:0;right:0;height:.4rem;top:0;z-index:2;background:var(--lime);box-shadow:0 0 2rem var(--lime);opacity:0}
 .scanning .scanline{opacity:.85;animation:scan 1.1s linear infinite}
 @keyframes scan{from{top:0}to{top:100%}}
 .side{flex:1;display:flex;flex-direction:column}
-.side .pbtn{justify-content:center;font-size:1.6rem;padding:1.6rem}
-.side .pbtn[disabled]{background:var(--s2);color:var(--mute);cursor:default;animation:none}
-.steps{margin-top:1.4rem;display:flex;flex-direction:column;gap:.9rem}
-.st{position:relative;padding:.2rem 0 .2rem 1.4rem;border-left:.3rem solid var(--s3);transition:border-color .3s}
-.st .k{font:700 1rem/1 "SM",monospace;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;transition:color .3s}
-.st b{display:block;font:700 1.6rem/1.2 "SG";margin-top:.3rem;color:#cfcfcf;transition:color .3s}
-.st p{font-size:1.2rem;line-height:1.4;color:var(--mute);margin-top:.2rem}
-.st .res{font:700 1.05rem/1.2 "SM",monospace;letter-spacing:.04em;color:var(--lime);text-transform:uppercase;margin-top:.4rem;opacity:0;transform:translateY(.4rem);transition:all .35s var(--ease)}
-.st .pg{height:.3rem;background:var(--s2);margin-top:.5rem;overflow:hidden}
-.st .pg i{display:block;height:100%;width:0;background:var(--lime)}
-.st.on{border-color:var(--pink)}.st.on .k{color:var(--pink)}.st.on b{color:#fff}
-.st.ok{border-color:var(--lime)}.st.ok .k{color:var(--lime)}.st.ok b{color:#fff}.st.ok .res{opacity:1;transform:none}
-.found{margin-top:1.4rem}
-.found .lbl{margin-bottom:.8rem}
-.it{display:grid;grid-template-columns:15rem 1fr 15rem;align-items:center;gap:1.4rem;padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);
- opacity:0;transform:translateY(.6rem);transition:opacity .35s var(--ease),transform .35s var(--ease)}
-.it.show{opacity:1;transform:none}
-.it .t{font:700 1.3rem/1.2 "SG"}.it .t small{display:block;font:700 .9rem/1.2 "SM",monospace;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin-top:.2rem}
-.it .c{height:.7rem;background:#2B2B2B}.it .c i{display:block;height:100%;width:0;background:var(--pink);transition:width .8s var(--ease)}
-.it .a{font:700 1rem/1.25 "SM",monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);text-align:right;transition:color .3s}
-.it.fx .a{color:var(--lime)}
-.foot{margin-top:1rem}
-.again{font:700 1.1rem/1 "SM",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);padding:1rem 1.2rem .9rem;background:rgba(255,255,255,.05);margin-top:1rem;align-self:flex-start;
+.side .pulse{display:block}
+.side .pbtn{width:100%;justify-content:center;font-size:1.7rem;padding:1.6rem}
+.side .pbtn[disabled]{background:var(--s2);color:var(--mute);cursor:default}
+.steps{margin-top:1.8rem;display:flex;flex-direction:column;gap:1.3rem}
+.st{padding:.1rem 0 .1rem 1.4rem;border-left:.3rem solid var(--s3);transition:border-color .3s}
+.st b{display:flex;align-items:baseline;gap:.8rem;font:700 1.8rem/1.2 "SG";color:#8f8f8f;transition:color .3s}
+.st b em{font:700 1.2rem/1 "SM",monospace;font-style:normal;color:var(--mute)}
+.st .res{font:700 1.3rem/1.2 "SM",monospace;letter-spacing:.04em;color:var(--lime);text-transform:uppercase;margin-top:.5rem;opacity:0;transform:translateY(.4rem);transition:all .35s var(--ease)}
+.st.on{border-color:var(--pink)}.st.on b{color:#fff}
+.st.ok{border-color:var(--lime)}.st.ok b{color:#fff}.st.ok .res{opacity:1;transform:none}
+.again{margin-top:1.4rem;align-self:flex-start;font:700 1.2rem/1 "SM",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);padding:1rem 1.2rem .9rem;background:rgba(255,255,255,.06);
  opacity:0;pointer-events:none;transition:opacity .3s}
 .done .again{opacity:1;pointer-events:auto}
+.foot{margin-top:1.6rem}
 </style>
 </head>
 <body>
 <div class="panel" id="p">
-  <p class="lbl reveal">Press it · what Heal This Scene does</p>
-  <h1 class="h reveal d1">One click. <span class="hl">Four steps.</span></h1>
+  <h1 class="h reveal">One click. <span class="hl">Four steps.</span></h1>
   <div class="main">
-    <div class="leftc">
-    <div class="view reveal d2" id="view">
+    <div class="view reveal d1" id="view">
       <video id="vA" muted playsinline loop preload="auto" poster="media/sing-cam-alone.jpg" src="media/sing-cam-alone.mp4"></video>
       <video id="vH" muted playsinline loop preload="auto" poster="media/sing-cam-heal.jpg" src="media/sing-cam-heal.mp4"></video>
       <span class="scanline"></span>
-      <span class="chip dark">Singularity 100_0040 · lighting file</span>
-      <div class="read"><small id="rl">Blender alone</small><b><span id="fps">0.41</span><small>fps</small></b></div>
+      <div class="read"><b><span id="fps">1.6</span><small>fps</small></b></div>
     </div>
-    <div class="found">
-      <p class="lbl pink">What the scan put first on this shot</p>
-      <div id="found"></div>
-    </div>
-    </div>
-    <div class="side reveal d3">
-      <button class="pbtn pulse" id="go" data-g="Heal This Scene"><svg class="px" viewBox="0 0 3 3" aria-hidden="true"><path fill="currentColor" d="M1 0h1v1h1v1H2v1H1V2H0V1h1z"/></svg>Heal This Scene</button>
-      <div class="steps" id="steps">
-        <div class="st"><span class="k">Step 1 · Scan</span><b>Finds what costs time</b><p>Every object, modifier, texture, rig and add-on, timed per frame.</p><div class="pg"><i></i></div><div class="res">138 slowdowns, ranked by cost</div></div>
-        <div class="st"><span class="k">Step 2 · Fix</span><b>Fixes what keeps renders the same</b><p>Each fix measured before and after. No gain, it is undone.</p><div class="pg"><i></i></div><div class="res">12 fixes · renders unchanged</div></div>
-        <div class="st"><span class="k">Step 3 · Relief</span><b>Lightens every shading mode</b><p>Solid, Material Preview, Rendered. Never saved in your file.</p><div class="pg"><i></i></div><div class="res">Solid · Material · Rendered</div></div>
-        <div class="st"><span class="k">Step 4 · Tune</span><b>Checks on real frames</b><p>Plays the shot, then gives quality back while the rate holds.</p><div class="pg"><i></i></div><div class="res">0.41 → 14.49 fps · ×35</div></div>
+    <div class="side reveal d2">
+      <span class="pulse" id="pw"><button class="pbtn" id="go" data-g="Heal This Scene"><svg class="px" viewBox="0 0 3 3" aria-hidden="true"><path fill="currentColor" d="M1 0h1v1h1v1H2v1H1V2H0V1h1z"/></svg>Heal This Scene</button></span>
+      <div class="steps">
+        <div class="st"><b><em>1</em>Scan</b><div class="res" id="r1">140 slowdowns, ranked by cost</div></div>
+        <div class="st"><b><em>2</em>Fix</b><div class="res" id="r2">12 fixes · renders unchanged</div></div>
+        <div class="st"><b><em>3</em>Relief</b><div class="res" id="r3">Lighter in every shading mode</div></div>
+        <div class="st"><b><em>4</em>Tune</b><div class="res" id="r4">Health 2 → 100 · 1.6 → 20 fps</div></div>
       </div>
-      <button class="again" id="again">↻ Run it again</button>
+      <button class="again" id="again">↻ Again</button>
     </div>
   </div>
-  <p class="foot">Real recordings and scan of Singularity 100_0040 on Windows · RTX 4070 SUPER · Blender 5.0.1. Healing took 12 s on this shot, shown faster here. A second Heal never does worse than the best one before it.</p>
+  <p class="foot" id="foot">Singularity 100_0040 · Windows, RTX 4070 SUPER · Heal took 6 s, shown faster</p>
 </div>
 <script src="assets/fm.js"></script>
 <script>
-const FOUND = [
-  {t: 'GEO-kelp-long', s: 'Geometry Nodes scatter', c: 16.2, a: 'Paused in the viewport'},
-  {t: 'GEO-kelp-medium', s: 'Geometry Nodes scatter', c: 16.1, a: 'Paused in the viewport'},
-  {t: 'Cycles preview samples', s: 'Only in the Rendered view', c: 15.5, a: 'Relief lightens Rendered'},
-  {t: 'RIG-critter_evolved', s: 'Deforming B-Bones (Rigify)', c: 7.8, a: 'Left as is · the rig stays whole', keep: true},
-  {t: 'Hidden objects', s: 'Still computed every frame', c: 6.3, a: 'Stop until shown again'}
-];
+const FPS = {a: 1.64, b: 20.03};
 const $ = id => document.getElementById(id);
 const P = $('p'), vA = $('vA'), vH = $('vH');
 const steps = [...document.querySelectorAll('.st')];
 let running = false;
-function list() {
-  $('found').innerHTML = FOUND.map(f => `<div class="it"><div class="t">${f.t}<small>${f.s}</small></div><div class="c"><i data-w="${f.c / 16.2 * 100}"></i></div><div class="a">Found</div></div>`).join('');
-}
 const wait = ms => new Promise(r => setTimeout(r, FM.reduce ? 0 : ms));
-async function fill(st, ms) {
-  const i = st.querySelector('.pg i'); i.style.transition = `width ${ms}ms linear`; i.style.width = '100%'; await wait(ms);
-}
 async function run() {
   if (running) return; running = true;
-  $('go').disabled = true; $('go').classList.remove('pulse');
-  P.classList.remove('done'); $('rl').textContent = 'Blender alone'; $('fps').textContent = '0.41';
-  steps.forEach(s => { s.classList.remove('on', 'ok'); const i = s.querySelector('.pg i'); i.style.transition = 'none'; i.style.width = '0'; });
-  list();
-  // 1 scan
-  steps[0].classList.add('on'); P.classList.add('scanning');
-  const items = [...document.querySelectorAll('.it')];
-  items.forEach((el, k) => setTimeout(() => { el.classList.add('show'); el.querySelector('.c i').style.width = el.querySelector('.c i').dataset.w + '%'; }, 250 + k * 260));
-  await fill(steps[0], 1900); steps[0].classList.replace('on', 'ok'); P.classList.remove('scanning');
-  // 2 fix
-  steps[1].classList.add('on');
-  items.forEach((el, k) => setTimeout(() => { el.classList.toggle('fx', !FOUND[k].keep); el.querySelector('.a').textContent = FOUND[k].a; }, 200 + k * 230));
-  await fill(steps[1], 1500); steps[1].classList.replace('on', 'ok');
-  // 3 relief
-  steps[2].classList.add('on'); await fill(steps[2], 1000); steps[2].classList.replace('on', 'ok');
-  // 4 tune: the healed recording takes over
-  steps[3].classList.add('on'); P.classList.add('done'); $('rl').textContent = 'After Heal This Scene';
-  vH.currentTime = 0; vH.play().catch(() => {});
-  FM.count($('fps'), 0.41, 14.49, 1500, 2);
-  await fill(steps[3], 1300); steps[3].classList.replace('on', 'ok');
-  const r = $('view').getBoundingClientRect(); FM.burst(document.body, r.right - 80, r.bottom - 40, 12);
+  $('go').disabled = true; $('pw').classList.remove('pulse');
+  P.classList.remove('done'); $('fps').textContent = FPS.a.toFixed(1);
+  steps.forEach(s => s.classList.remove('on', 'ok'));
+  const durs = [1700, 1400, 900, 1100];
+  for (let i = 0; i < 4; i++) {
+    steps[i].classList.add('on');
+    if (i === 0) P.classList.add('scanning');
+    if (i === 3) { P.classList.add('done'); vH.currentTime = 0; vH.play().catch(() => {}); FM.count($('fps'), FPS.a, FPS.b, 1300, 1); }
+    await wait(durs[i]);
+    if (i === 0) P.classList.remove('scanning');
+    steps[i].classList.replace('on', 'ok');
+  }
+  const r = $('view').getBoundingClientRect(); FM.burst(document.body, r.right - 70, r.bottom - 40, 12);
   running = false;
 }
 $('go').onclick = run;
 $('again').onclick = () => { vH.pause(); run(); };
-list();
 FM.onView(P, () => {
   P.classList.add('in'); vA.play().catch(() => {});
-  setTimeout(() => { if (!running && !P.classList.contains('done')) run(); }, 5000);
+  setTimeout(() => { if (!running && !P.classList.contains('done')) run(); }, 3500);
 });
 </script>
 </body>

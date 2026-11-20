@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Frame Medic · What it never touches</title>
+<link rel="preload" href="fonts/Panchang-Extrabold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fm.css">
+<style>
+.panel{--h:37.2rem;padding:2.8rem}
+.sub{font-size:1.6rem;color:var(--soft);margin-top:1rem}
+.keys{display:flex;gap:1.4rem;margin-top:2.4rem}
+.key{flex:1;position:relative;background:#2b2b2b;padding:1.6rem 1.4rem 1.4rem;text-align:left;border-bottom:.5rem solid #161616;transition:transform .12s,border-width .12s,background .25s;
+ clip-path:polygon(.9rem 0,100% 0,100% calc(100% - .9rem),calc(100% - .9rem) 100%,0 100%,0 .9rem)}
+.key:hover{background:#333}
+.key.down{transform:translateY(.4rem);border-bottom-width:.1rem}
+.key.sel{background:#fff;color:var(--ink)}
+.key kbd{display:block;font:700 2.2rem/1 "SM",monospace;letter-spacing:.02em}
+.key span{display:block;margin-top:.8rem;font:700 1.2rem/1.2 "SM",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.key.sel span{color:#555}
+.stage{margin-top:2rem;display:flex;align-items:center;gap:1.4rem;min-height:5.4rem}
+.st{font:700 1.3rem/1 "SM",monospace;letter-spacing:.06em;text-transform:uppercase;padding:1rem 1.2rem .9rem;background:rgba(255,255,255,.06);color:var(--soft);
+ opacity:.35;transition:opacity .3s,background .3s,color .3s;clip-path:polygon(.6rem 0,100% 0,100% calc(100% - .6rem),calc(100% - .6rem) 100%,0 100%,0 .6rem)}
+.st.on{opacity:1;background:var(--lime);color:var(--ink)}
+.st.pk.on{background:var(--pink);color:#fff}
+.ar{color:var(--s3);font:700 1.6rem/1 "SM",monospace}
+.say{margin-top:1.6rem;font-size:1.8rem;line-height:1.45;color:#fff;min-height:5.4rem;max-width:72rem}
+.say b{color:var(--lime);font-weight:700}
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <h1 class="h reveal">What it <span class="hl">never touches.</span></h1>
+  <p class="sub reveal d1">Press a key.</p>
+  <div class="keys reveal d2" id="keys">
+    <button class="key" data-k="0"><kbd>F12</kbd><span>Render</span></button>
+    <button class="key" data-k="1"><kbd>Ctrl S</kbd><span>Save</span></button>
+    <button class="key" data-k="2"><kbd>Space</kbd><span>Play</span></button>
+    <button class="key" data-k="3"><kbd>Ctrl Z</kbd><span>Undo</span></button>
+  </div>
+  <div class="stage" id="stage"></div>
+  <p class="say" id="say"></p>
+</div>
+<script src="assets/fm.js"></script>
+<script>
+// each key: the states it walks through (pink = Frame Medic steps aside), then what it means
+const K = [
+  {s: [['Relief on', 0], ['Steps aside', 1], ['Full quality render', 0], ['Relief back', 0]],
+   t: 'Your <b>renders</b> use the full scene, with every setting you made.'},
+  {s: [['Relief on', 0], ['Lifted', 1], ['Saved as you made it', 0], ['Relief back', 0]],
+   t: 'Your <b>file</b> never keeps anything Relief changed.'},
+  {s: [['Playing', 0], ['Rigs whole', 0], ['Simulations simulate', 0]],
+   t: 'Your <b>characters</b> deform as rigged. Cloth, soft bodies and simulation nodes keep simulating.'},
+  {s: [['Undo', 0], ['Relief consistent', 0], ['Pause gives it all back', 1]],
+   t: '<b>One click</b> gives everything back, exactly.'}
+];
+const $ = id => document.getElementById(id);
+let timer = [], cur = -1;
+function press(i) {
+  timer.forEach(clearTimeout); timer = []; cur = i;
+  document.querySelectorAll('.key').forEach((k, j) => k.classList.toggle('sel', j === i));
+  const k = document.querySelectorAll('.key')[i]; k.classList.add('down'); setTimeout(() => k.classList.remove('down'), 140);
+  $('stage').innerHTML = K[i].s.map((s, j) => (j ? '<span class="ar">→</span>' : '') + `<span class="st${s[1] ? ' pk' : ''}">${s[0]}</span>`).join('');
+  $('say').innerHTML = '';
+  const st = [...document.querySelectorAll('.st')];
+  st.forEach((el, j) => timer.push(setTimeout(() => { st.forEach(o => o.classList.remove('on')); el.classList.add('on'); }, FM.reduce ? 0 : 150 + j * 520)));
+  timer.push(setTimeout(() => { $('say').innerHTML = K[i].t; }, FM.reduce ? 0 : 150 + st.length * 520));
+}
+document.querySelectorAll('.key').forEach(k => k.onclick = () => { auto = false; press(+k.dataset.k); });
+let auto = true;
+FM.onView($('p'), () => {
+  $('p').classList.add('in');
+  let i = 0;
+  const go = () => { if (!auto) return; press(i % K.length); i++; if (i < K.length) setTimeout(go, 3600); };
+  setTimeout(go, 700);
+});
+</script>
+</body>
+</html>

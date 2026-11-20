@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Frame Medic · Crash Shield</title>
+<link rel="preload" href="fonts/Panchang-Extrabold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fm.css">
+<style>
+.panel{--h:44.2rem;padding:2.8rem}
+.sub{font-size:1.6rem;line-height:1.45;color:var(--soft);margin-top:1rem;max-width:62rem}
+.mod{margin-top:2.4rem;background:#2b2b2b;padding:1.6rem 1.8rem;clip-path:polygon(1rem 0,100% 0,100% calc(100% - 1rem),calc(100% - 1rem) 100%,0 100%,0 1rem)}
+.mh{display:flex;align-items:center;gap:1rem;font:700 1.4rem/1 "SG";color:#ddd}
+.mh i{width:1.6rem;height:1.6rem;background:#59b4ff;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.mh span{margin-left:auto;font:700 1.15rem/1 "SM",monospace;color:var(--mute);letter-spacing:.06em;text-transform:uppercase}
+.row{display:flex;align-items:center;gap:1.6rem;margin-top:1.4rem}
+.row label{flex:0 0 11rem;font-size:1.45rem;color:#bdbdbd}
+.field{flex:0 0 17rem;font:700 1.7rem/1 "SM",monospace;color:#fff;background:#1a1a1a;padding:1rem 1.2rem;text-align:right;transition:color .3s,background .3s}
+.held .field{color:var(--lime)}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:.6rem;background:linear-gradient(90deg,var(--s3),var(--pink));outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:2rem;height:2.6rem;background:#fff;border:0}
+input[type=range]::-moz-range-thumb{width:2rem;height:2.6rem;background:#fff;border:0;border-radius:0}
+.res{display:flex;align-items:center;gap:1.6rem;margin-top:1.6rem}
+.res .k{flex:0 0 11rem;font-size:1.45rem;color:#bdbdbd}
+.meter{flex:1;position:relative;height:1.2rem;background:#1a1a1a}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--lime);transition:width .15s,background .2s}
+.meter.over i{background:var(--pink)}
+.meter b{position:absolute;top:-.6rem;bottom:-.6rem;width:.3rem;background:#fff;left:60%}
+.meter small{position:absolute;top:-2.4rem;transform:translateX(-50%);left:60%;font:700 1.05rem/1 "SM",monospace;color:var(--soft);letter-spacing:.06em;white-space:nowrap;text-transform:uppercase}
+.faces{flex:0 0 17rem;text-align:right;font:700 2rem/1 "SM",monospace;color:#fff}
+.faces small{font-size:1.2rem;color:var(--mute);margin-left:.4rem}
+.toast{margin-top:2rem;display:flex;align-items:center;gap:1.4rem;background:#2e2e2e;border-left:.5rem solid var(--lime);padding:1.4rem 1.6rem;
+ opacity:0;transform:translateY(1rem);transition:opacity .35s var(--ease),transform .45s var(--spring)}
+.toast.on{opacity:1;transform:none}
+.toast svg{flex:none;width:2rem;height:2.4rem;color:var(--lime)}
+.toast b{display:block;font:700 1.6rem/1.2 "SG"}
+.toast p{font-size:1.35rem;color:var(--soft);margin-top:.3rem}
+.toast button{margin-left:auto;flex:none;font:700 1.2rem/1 "SM",monospace;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.08);color:#fff;padding:1rem 1.2rem}
+.toast button:hover{background:rgba(255,255,255,.16)}
+.foot{margin-top:1.6rem}
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <h1 class="h reveal">Typed one zero <span class="hl">too many?</span></h1>
+  <p class="sub reveal d1">Crash Shield holds a value that would freeze Blender before Blender computes it. Drag the voxel size down.</p>
+  <div class="mod reveal d2" id="mod">
+    <div class="mh"><i></i>Remesh<span>Voxel mode</span></div>
+    <div class="row"><label for="vx">Voxel Size</label><div class="field" id="fv">0.0100 m</div><input type="range" id="vx" min="0" max="1000" value="0" aria-label="Voxel size"></div>
+    <div class="res"><span class="k">Result</span><div class="meter" id="meter"><i id="bar"></i><b></b><small>Limit 64 M</small></div><div class="faces"><span id="nf">0.0</span><small>M faces</small></div></div>
+  </div>
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 5 6" aria-hidden="true"><path fill="currentColor" d="M1 0h3v3H1zM2 4h1v2H2z"/></svg>
+    <div><b id="tb">Crash Shield: Remesh held at 0.00013 m</b><p id="tp">0.0001 would make about 106 million faces · Safety section: Allow</p></div>
+    <button id="allow">Allow</button>
+  </div>
+  <p class="foot">A real case on our test PC: a Remesh at 0.0001 on a decal, about 106 million faces. The limit is a million faces per GB of memory (8 to 64 million)</p>
+</div>
+<script src="assets/fm.js"></script>
+<script>
+// faces made by the Remesh, scaled from the real case (0.0001 m -> about 106 million faces): faces ~ 1 / voxel^2
+const $ = id => document.getElementById(id);
+const LIMIT = 64e6, VMAX = 0.01, VMIN = 0.0001;
+const faces = v => 1.06e6 * Math.pow(0.001 / v, 2);
+const vAt = s => VMAX * Math.pow(VMIN / VMAX, s / 1000);          // log slider
+const held = 0.001 * Math.sqrt(1.06e6 / LIMIT);                       // largest voxel count that fits the limit
+const fmtV = v => v >= 0.001 ? v.toFixed(4) : v.toFixed(5);
+let allowed = false;
+function show(v, hold) {
+  const f = faces(v), shown = hold ? faces(held) : f;
+  $('fv').textContent = fmtV(hold ? held : v) + ' m';
+  $('nf').textContent = (shown / 1e6).toFixed(shown < 1e7 ? 1 : 0);
+  $('bar').style.width = Math.min(100, Math.log10(Math.max(shown, 1e5) / 1e5) / Math.log10(2e8 / 1e5) * 100) + '%';
+  $('meter').classList.toggle('over', !hold && f > LIMIT);
+  $('mod').classList.toggle('held', hold);
+  if (hold) {
+    $('tb').textContent = `Crash Shield: Remesh held at ${fmtV(held)} m`;
+    $('tp').textContent = `${fmtV(v)} would make about ${Math.round(f / 1e6)} million faces · Safety section: Allow`;
+  }
+  $('toast').classList.toggle('on', hold);
+}
+// the limit marker sits where the limit falls on the same log scale
+document.querySelector('.meter b').style.left = document.querySelector('.meter small').style.left =
+  (Math.log10(LIMIT / 1e5) / Math.log10(2e8 / 1e5) * 100) + '%';
+$('vx').addEventListener('input', e => { const v = vAt(+e.target.value); show(v, !allowed && faces(v) > LIMIT); });
+$('allow').onclick = () => { allowed = true; $('toast').classList.remove('on'); $('mod').classList.remove('held');
+  $('fv').textContent = 'Allowed'; setTimeout(() => { allowed = false; $('vx').value = 0; show(VMAX, false); }, 2200); };
+show(VMAX, false);
+// on screen: the slider slides down by itself once, until the shield holds it
+FM.onView($('p'), () => {
+  $('p').classList.add('in');
+  if (FM.reduce) return;
+  let s = 0;
+  const step = () => { s = Math.min(1000, s + 12); $('vx').value = s; if (s < 1000) { show(vAt(s), false); setTimeout(step, 28); } else show(VMIN, true); };
+  setTimeout(step, 900);
+});
+</script>
+</body>
+</html>

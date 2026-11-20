@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Frame Medic · It tells you why</title>
+<link rel="preload" href="fonts/Panchang-Extrabold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fm.css">
+<style>
+.panel{--h:57.4rem;padding:2.8rem}
+.sub{font-size:1.6rem;color:var(--soft);margin-top:1rem}
+.main{display:flex;gap:2rem;margin-top:2rem;align-items:flex-start}
+.list{flex:0 0 44rem}
+.lh{display:flex;justify-content:space-between;font:700 1.15rem/1 "SM",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:.8rem}
+.it{display:flex;align-items:center;gap:1.2rem;background:#262626;padding:1.1rem 1.2rem;margin-bottom:.6rem;cursor:pointer;border-left:.4rem solid transparent;
+ transition:background .2s,border-color .2s,opacity .35s,transform .35s var(--ease)}
+.it:hover{background:#2e2e2e}
+.it.sel{border-color:var(--pink);background:#2e2e2e}
+.it.gone{opacity:0;transform:translateX(3rem);pointer-events:none}
+.it .n{flex:none;width:3rem;height:3rem;display:flex;align-items:center;justify-content:center;font:700 1.4rem/1 "SM",monospace;background:#3a3a3a}
+.it.sel .n{background:var(--lime);color:var(--ink)}
+.it .t{flex:1;min-width:0}
+.it .t b{display:block;font:700 1.45rem/1.25 "SG"}
+.it .t i{display:block;height:.4rem;background:#1b1b1b;margin-top:.7rem}
+.it .t i em{display:block;height:100%;background:var(--pink)}
+.fx{flex:none;font:700 1.25rem/1 "SM",monospace;letter-spacing:.06em;text-transform:uppercase;background:var(--violet);color:#fff;padding:1.1rem 1.2rem}
+.fx:hover{background:#7a2bff}
+.fx.keep{background:#3a3a3a;color:var(--soft);cursor:default}
+.all{width:100%;margin-top:.4rem;font:700 1.3rem/1 "SM",monospace;letter-spacing:.06em;text-transform:uppercase;background:var(--violet);color:#fff;padding:1.3rem}
+.all:hover{background:#7a2bff}
+.all[disabled]{background:#2b2b2b;color:var(--mute);cursor:default}
+.side{flex:1;min-height:31rem}
+.card{background:var(--s1);padding:1.8rem;clip-path:polygon(1rem 0,100% 0,100% calc(100% - 1rem),calc(100% - 1rem) 100%,0 100%,0 1rem)}
+.card .k{font:700 1.15rem/1 "SM",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--pink)}
+.card p{font-size:1.5rem;line-height:1.45;color:#e2e2e2;margin-top:.8rem}
+.card .do{margin-top:1.4rem;font:700 1.3rem/1.3 "SM",monospace;color:var(--lime)}
+.fixed{margin-top:1.4rem}
+.fixed .lh{color:var(--lime)}
+.fr{display:flex;align-items:center;gap:1rem;padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:1.4rem;animation:in .4s var(--ease)}
+@keyframes in{from{opacity:0;transform:translateY(.6rem)}}
+.fr span{flex:1}
+.fr button{font:700 1.15rem/1 "SM",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:rgba(255,255,255,.07);padding:.8rem 1rem}
+.fr button:hover{color:#fff;background:rgba(255,255,255,.14)}
+.empty{font-size:1.35rem;color:var(--mute);padding:.6rem 0}
+.foot{margin-top:1.4rem}
+</style>
+</head>
+<body>
+<div class="panel" id="p">
+  <h1 class="h reveal">It tells you <span class="hl">why.</span></h1>
+  <p class="sub reveal d1">Every slowdown named, ranked by what it costs, with a fix that keeps your renders as they are.</p>
+  <div class="main reveal d2">
+    <div class="list">
+      <div class="lh"><span>Slowdowns · Singularity 100_0040</span><span>Cost</span></div>
+      <div id="items"></div>
+      <button class="all" id="all">Fix all · renders unchanged</button>
+    </div>
+    <div class="side">
+      <div class="card"><p class="k" id="ck"></p><p id="cp"></p><p class="do" id="cd"></p></div>
+      <div class="fixed"><div class="lh"><span>Fixed</span><span id="fc">0</span></div><div id="fixed"><p class="empty">Press Fix.</p></div></div>
+    </div>
+  </div>
+  <p class="foot">Real slowdowns from the scan of Singularity 100_0040 (Blender Studio, CC BY) with Frame Medic 1.1.0</p>
+</div>
+<script src="assets/fm.js"></script>
+<script>
+// titles, explanations and fixes as the 1.1.0 scan writes them for this shot (shortened); c = relative cost per frame
+const IT = [
+  {t: 'GEO-kelp-long: scatter node group is heavy', c: 16.2,
+   p: 'A Geometry Nodes scatter makes thousands of kelp leaves, computed again at every frame.',
+   d: 'Fix: pause it in the viewport. One click shows it again. Renders keep it.', f: 'Kelp scatter paused in the viewport'},
+  {t: 'Cycles viewport: many samples, no denoiser', c: 15.5,
+   p: 'The Cycles view refines up to 2048 samples with no denoiser: a clean picture takes long after each change.',
+   d: 'Fix: 64 samples with the denoiser while you work. Final renders keep their own samples.', f: 'Viewport samples 2048 → 64, denoised'},
+  {t: 'Hidden objects still computed every frame', c: 6.3,
+   p: 'The eye icon only hides the display: these objects are still evaluated on every frame.',
+   d: 'Fix: stop computing them until they are shown again. Renders untouched.', f: 'Hidden objects no longer computed'},
+  {t: 'Deforming B-Bones: RIG-critter_evolved', c: 7.8, keep: true,
+   p: '65 deform bones are B-Bones (655 segments). They shape how the character bends.',
+   d: 'Heal leaves it: the character bends exactly as rigged. Relief can lower them while you animate, if you choose.', f: ''}
+];
+const $ = id => document.getElementById(id);
+let sel = 0;
+function render() {
+  $('items').innerHTML = IT.map((it, i) => it.done ? '' : `<div class="it${i === sel ? ' sel' : ''}" data-i="${i}">
+    <span class="n">${i + 1}</span><span class="t"><b>${it.t}</b><i><em style="width:${it.c / 16.2 * 100}%"></em></i></span>
+    <button class="fx${it.keep ? ' keep' : ''}" data-i="${i}">${it.keep ? 'Kept' : 'Fix'}</button></div>`).join('');
+  const it = IT[sel];
+  $('ck').textContent = it.keep ? 'Left alone' : 'What it is'; $('cp').textContent = it.p; $('cd').textContent = it.d;
+  const done = IT.filter(x => x.done);
+  $('fc').textContent = done.length;
+  $('fixed').innerHTML = done.length ? done.map(x => `<div class="fr"><span>${x.f}</span><button data-u="${IT.indexOf(x)}">Undo</button></div>`).join('') : '<p class="empty">Press Fix.</p>';
+  $('all').disabled = !IT.some(x => !x.keep && !x.done);
+}
+function fix(i) {
+  if (IT[i].keep || IT[i].done) { sel = i; render(); return; }
+  sel = i; render();
+  const row = document.querySelector(`.it[data-i="${i}"]`);
+  const r = row.getBoundingClientRect(); FM.burst(document.body, r.right - 40, r.top + r.height / 2, 8); row.classList.add('gone');
+  setTimeout(() => { IT[i].done = true; sel = IT.findIndex(x => !x.done) ; if (sel < 0) sel = 3; render(); }, 250);
+}
+$('items').addEventListener('click', e => {
+  const b = e.target.closest('.fx'), row = e.target.closest('.it');
+  if (b) fix(+b.dataset.i); else if (row) { sel = +row.dataset.i; render(); }
+});
+$('fixed').addEventListener('click', e => { const u = e.target.closest('[data-u]'); if (u) { IT[+u.dataset.u].done = false; sel = +u.dataset.u; render(); } });
+$('all').onclick = () => { IT.forEach((x, i) => { if (!x.keep && !x.done) setTimeout(() => fix(i), i * 260); }); };
+render();
+FM.onView($('p'), () => { $('p').classList.add('in'); setTimeout(() => { if (!IT[0].done) fix(0); }, 2200); });
+</script>
+</body>
+</html>
