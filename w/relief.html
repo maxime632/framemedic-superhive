@@ -3,23 +3,65 @@
 <link rel="icon" href="data:,"><title>Frame Medic · Relief</title>
 <link rel="stylesheet" href="w.css">
 <style>
-.w{flex-direction:row;gap:16px}
-.l{flex:1.5;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:12px}
-.l img{display:block;width:100%;height:auto}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips span{font-size:11px;color:var(--soft);background:var(--s2);padding:7px 9px 6px;clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
-.chips span.on{background:var(--pink);color:#fff}
-.r{flex:1;min-width:0;display:flex}
-.r img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
-@media (max-width:559px){.w{flex-direction:column;gap:10px}.l{flex:none;gap:8px}.r{flex:1;min-height:0}.chips span{font-size:10px;padding:6px 7px 5px}}
+.w{gap:12px}
+.sw{align-self:flex-start;display:flex;align-items:center;gap:12px;font:700 14px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.06em;color:var(--soft);background:var(--s2);padding:0 16px;min-height:46px;transition:background .25s,color .25s}
+.sw i{position:relative;width:42px;height:20px;background:var(--s3);transition:background .25s}
+.sw i::after{content:"";position:absolute;left:3px;top:3px;width:14px;height:14px;background:var(--soft);transition:transform .25s var(--e),background .25s}
+.on .sw{background:var(--pink);color:#fff}
+.on .sw i{background:rgba(255,255,255,.3)}.on .sw i::after{transform:translateX(22px);background:#fff}
+.hud{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--s1);border:2px solid var(--pink);padding:14px 16px 12px;transition:border-color .4s}
+.on .hud{border-color:var(--lime)}
+.top{display:flex;justify-content:space-between;font-size:11px;color:var(--mute)}
+.num{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+.num b{font:700 clamp(40px,9vw,64px)/1 SM,"Space Mono",Menlo,monospace;letter-spacing:-.02em;color:var(--pink);transition:color .4s}
+.on .num b{color:var(--lime)}
+.num span{font-size:14px;color:var(--soft)}
+canvas{flex:1;min-height:0;width:100%;display:block;margin-top:8px}
+@media (max-width:559px){.sw{min-height:42px;font-size:13px}.hud{padding:10px 12px}}
 </style></head>
 <body>
-<header class="hd"><span class="no m">02</span><h2>LIGHTER <em>WHILE YOU WORK.</em></h2><p>Relief lightens the viewport object by object. Pause it and the scene is exactly as you made it.</p></header>
-<div class="w">
-  <div class="l">
-    <img class="cut" src="../media/ui/readout.png" width="574" height="204" alt="The playback readout in the view: 20.5 frames per second for a 24 fps shot, with Relief on">
-    <div class="chips m"><span class="on">RELIEF ON</span><span>SUBDIVISION</span><span>TEXTURES</span><span>HAIR</span><span>MATERIAL PREVIEW</span><span>GREASE PENCIL</span><span>RIGS</span></div>
+<header class="hd"><span class="no m">02</span><h2>LIGHTER <em>WHILE YOU WORK.</em></h2><p>Relief lightens the viewport while you work. Pause it and the scene is exactly as you made it.</p><span class="try">TRY IT · SWITCH RELIEF OFF AND ON</span></header>
+<div class="w" id="w">
+  <button class="sw" id="sw" aria-pressed="false">RELIEF <span id="lab">PAUSED</span> <i></i></button>
+  <div class="hud cut" style="--k:10px">
+    <div class="top m"><span>PLAYBACK · CHARGE</span><span>RTX 4070 SUPER</span></div>
+    <div class="num"><b id="fps">1.3</b><span class="m">/ 24 FPS</span></div>
+    <canvas id="cv" aria-hidden="true"></canvas>
   </div>
-  <div class="r"><img class="cut" src="../media/ui/relief.png" width="512" height="598" alt="The Relief section of the Frame Medic panel, on Auto"></div>
 </div>
+<script src="w.js"></script>
+<script>
+// Charge (Blender Studio) on River 7, fixed 1.1.0, every frame played: Relief paused 1.3 fps, Relief on 20.0 fps (Heal fixed nothing there, Relief does it)
+const $ = id => document.getElementById(id), w = $('w'), cv = $('cv'), cx = cv.getContext('2d');
+const OFF = 1.3, ON = 20.0, N = 60;
+let on = false, auto = true, cur = OFF, visible = false, hist = Array(N).fill(OFF);
+function set(v) {
+  on = v; w.classList.toggle('on', v); $('sw').setAttribute('aria-pressed', v); $('lab').textContent = v ? 'ON' : 'PAUSED';
+  W.count($('fps'), cur, v ? ON : OFF, 900, 1);
+}
+function draw() {
+  const r = cv.getBoundingClientRect(), d = devicePixelRatio || 1;
+  if (cv.width !== Math.round(r.width * d) || cv.height !== Math.round(r.height * d)) { cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d); }
+  const W_ = cv.width, H = cv.height, y = v => H - 4 * d - (H - 10 * d) * Math.min(v, 24) / 24;
+  cx.clearRect(0, 0, W_, H);
+  cx.setLineDash([6 * d, 6 * d]); cx.strokeStyle = '#555'; cx.lineWidth = d; cx.beginPath(); cx.moveTo(0, y(24)); cx.lineTo(W_, y(24)); cx.stroke();
+  cx.setLineDash([]); cx.strokeStyle = on ? '#CEFF05' : '#FF2E9B'; cx.lineWidth = 2.5 * d; cx.lineJoin = 'round'; cx.beginPath();
+  hist.forEach((v, i) => { const x = i / (N - 1) * (W_ - 6 * d); i ? cx.lineTo(x, y(v)) : cx.moveTo(x, y(v)); });
+  cx.stroke();
+  cx.fillStyle = '#fff'; cx.fillRect(W_ - 9 * d, y(hist[N - 1]) - 3 * d, 6 * d, 6 * d);
+}
+setInterval(() => {
+  if (!visible) return;
+  const t = on ? ON : OFF;
+  cur += (t - cur) * 0.35;
+  hist.push(Math.max(0.3, cur + (W.reduce ? 0 : (Math.random() - 0.5) * (on ? 1.6 : 0.5)))); hist.shift();
+  draw();
+}, 110);
+$('sw').onclick = () => { auto = false; set(!on); };
+let seen = false;
+W.view(document.body, v => {
+  visible = v; if (v) draw();
+  if (v && !seen) { seen = true; setTimeout(() => { if (auto) set(true); }, 1400); }
+});
+</script>
 </body></html>
