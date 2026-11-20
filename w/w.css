@@ -1,0 +1,30 @@
+@font-face{font-family:SG;font-weight:500;font-display:swap;src:url(../fonts/SpaceGrotesk-Medium.woff2) format("woff2")}
+@font-face{font-family:SG;font-weight:700;font-display:swap;src:url(../fonts/SpaceGrotesk-Bold.woff2) format("woff2")}
+@font-face{font-family:SM;font-weight:700;font-display:swap;src:url(../fonts/SpaceMono-Bold.woff2) format("woff2")}
+:root{--bg:#141414;--s1:#1C1C1C;--s2:#262626;--s3:#323232;--line:#2C2C2C;--txt:#F2F2F2;--soft:#B5B5B5;--mute:#8A8A8A;
+ --pink:#FF2E9B;--lime:#CEFF05;--violet:#5D00FF;--vio:#A57BFF;--e:cubic-bezier(.2,.8,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:transparent;color:var(--txt);
+ font:500 15px/1.4 SG,"Space Grotesk",Inter,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;letter-spacing:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible{outline:2px solid var(--lime);outline-offset:-2px}
+b,strong{font-weight:700}
+.m{font-family:SM,"Space Mono",Menlo,Consolas,monospace;font-weight:700;letter-spacing:.05em}
+.cut{clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
+.w{position:relative;height:100%;padding:22px 24px;display:flex;flex-direction:column;background:var(--bg);
+ clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px)}
+/* brand: chiseled corners, never round */
+.cta,.ghost,.fx,.key,.stat,.card,.steps li,.r,.mod,.toast,.sw,.seg button,.view,.shot img,.read,.val,.st{
+ clip-path:polygon(var(--k,6px) 0,100% 0,100% calc(100% - var(--k,6px)),calc(100% - var(--k,6px)) 100%,0 100%,0 var(--k,6px))}
+.view,.mod,.card,.stat,.shot img{--k:10px}.st,.val,.read{--k:4px}
+.cta{display:inline-flex;align-items:center;justify-content:center;gap:.55em;font:700 13px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.06em;
+ color:#141414;background:var(--lime);padding:13px 16px 12px;min-height:40px;transition:background .2s}
+.cta:hover,.cta:focus-visible{background:#fff;outline:none}
+.cta svg{width:11px;height:11px}
+.cta:disabled{background:var(--s3);color:var(--mute);cursor:default}
+.ghost{font:700 12px/1 SM,"Space Mono",Menlo,monospace;letter-spacing:.06em;color:var(--soft);background:var(--s2);padding:11px 13px 10px;min-height:36px}
+.ghost:hover{color:#fff;background:var(--s3)}
+@keyframes pl{50%{filter:drop-shadow(0 0 10px rgba(206,255,5,.7))}}
+.pulse{display:inline-flex;animation:pl 1.8s ease-in-out infinite}
+@media (max-width:559px){.w{padding:14px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
