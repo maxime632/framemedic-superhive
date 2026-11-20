@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Frame Medic · Blender alone vs Frame Medic</title>
+<style>
+@font-face{font-family:SM;font-weight:700;font-display:swap;src:url(fonts/SpaceMono-Bold.woff2) format("woff2")}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d0d0d}
+:root{--m:clamp(6px,1.8vw,14px);--fs:clamp(9px,1.55vw,13px);--k:clamp(30px,5.6vw,46px)}
+.st{--x:100%;position:relative;width:100%;height:100%;overflow:hidden;touch-action:pan-y;-webkit-user-select:none;user-select:none;
+ font-family:SM,ui-monospace,Menlo,Consolas,monospace;font-weight:700;letter-spacing:.06em;line-height:1;color:#fff}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#0d0d0d}
+#vB{clip-path:inset(0 0 0 var(--x))}
+.tag{position:absolute;top:var(--m);z-index:3;display:flex;align-items:center;font-size:var(--fs);background:rgba(12,12,12,.8);padding:.6em .75em .55em;white-space:nowrap;transition:opacity .35s}
+.tag i{width:.7em;height:.7em;margin-right:.6em;background:var(--c);flex:none}
+.tag b{color:var(--c);margin-left:.7em}
+.a{left:var(--m);--c:#FF2E9B}
+.b{right:var(--m);--c:#CEFF05}
+.st:not(.healed) .b{opacity:0}
+.cta{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,10,10,.35);transition:opacity .35s}
+.healed .cta{opacity:0;pointer-events:none}
+.healing .cta{background:transparent}
+button{font:inherit;letter-spacing:inherit;border:0;margin:0;cursor:pointer}
+.pulse{display:inline-block;animation:pl 1.8s ease-in-out infinite}
+@keyframes pl{50%{filter:drop-shadow(0 0 .9em rgba(206,255,5,.75))}}
+.heal{display:flex;align-items:center;font-size:clamp(11px,2.1vw,18px);color:#1C1C1C;background:#CEFF05;padding:.95em 1.3em .9em;
+ clip-path:polygon(.5em 0,100% 0,100% calc(100% - .5em),calc(100% - .5em) 100%,0 100%,0 .5em)}
+.heal:hover,.heal:focus-visible{background:#fff;outline:none}
+.heal svg{width:.85em;height:.85em;margin-right:.6em}
+.healing .heal{visibility:hidden}
+.msg{margin-top:.9em;font-size:var(--fs);min-height:1em;text-shadow:0 1px 3px #000}
+.line{position:absolute;top:0;bottom:0;left:var(--x);z-index:3;width:2px;margin-left:-1px;background:#CEFF05;opacity:0;transition:opacity .3s}
+.healing .line,.healed .line{opacity:1}
+.knob{position:absolute;top:50%;left:var(--x);z-index:5;width:var(--k);height:var(--k);margin:calc(var(--k) / -2) 0 0 calc(var(--k) / -2);
+ display:none;align-items:center;justify-content:center;background:#CEFF05;color:#1C1C1C;cursor:ew-resize;touch-action:none}
+.healed .knob{display:flex}
+.knob:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.knob svg{width:56%;height:56%}
+.hint{position:absolute;top:50%;left:var(--x);z-index:5;margin:calc(var(--k) / 2 + 6px) 0 0;transform:translateX(-50%);font-size:var(--fs);color:#1C1C1C;background:#fff;
+ padding:.55em .7em .5em;opacity:0;transition:opacity .4s;pointer-events:none;white-space:nowrap}
+.hint.on{opacity:1}
+.bar{position:absolute;left:var(--m);right:var(--m);bottom:var(--m);z-index:6;display:flex;align-items:center;pointer-events:none}
+.bar button{pointer-events:auto;font-size:var(--fs);min-height:28px;padding:.7em .85em .65em;color:#fff;background:rgba(12,12,12,.8);margin-right:4px}
+.bar button:hover{background:rgba(40,40,40,.9)}
+.bar button[aria-pressed=true]{background:#fff;color:#1C1C1C}
+.bar button:focus-visible{outline:2px solid #CEFF05;outline-offset:1px}
+#again{margin:0 0 0 auto}
+.st:not(.healed) #again{visibility:hidden}
+@media (max-width:440px){.tag{flex-wrap:wrap;max-width:46%}.tag b{flex-basis:100%;margin:.45em 0 0 1.3em}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="st" id="st">
+  <video id="vA" muted playsinline loop preload="auto" aria-label="Blender alone"></video>
+  <video id="vB" muted playsinline loop preload="auto" aria-label="With Frame Medic"></video>
+  <span class="tag a"><i></i>BLENDER ALONE<b id="fa"></b></span>
+  <span class="tag b"><i></i>FRAME MEDIC<b id="fb"></b></span>
+  <span class="line"></span>
+  <span class="knob" id="knob" tabindex="0" role="slider" aria-label="Divider between Blender alone and Frame Medic" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+    <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M9 6 2 13l7 7M17 6l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3.2"/></svg></span>
+  <span class="hint" id="hint">DRAG</span>
+  <div class="cta">
+    <span class="pulse"><button class="heal" id="heal"><svg viewBox="0 0 3 3" aria-hidden="true"><path fill="currentColor" d="M1 0h1v1h1v1H2v1H1V2H0V1h1z"/></svg>HEAL THIS SCENE</button></span>
+    <span class="msg" id="msg" aria-live="polite"></span>
+  </div>
+  <div class="bar">
+    <button data-s="sing" aria-pressed="true">SINGULARITY</button><button data-s="charge" aria-pressed="false">CHARGE</button>
+    <button id="again" aria-label="Play the comparison again">↻ AGAIN</button>
+  </div>
+</div>
+<script>
+// fps = pictures per second measured in Blender with Frame Dropping, no recording running (River 7, fixed 1.1.0)
+const SHOTS = {
+  sing: {v: 'sing-cam', a: '1.6', b: '20.0', msg: '140 SLOWDOWNS FOUND · 12 FIXED'},
+  charge: {v: 'charge-orbit', a: '1.2', b: '19.6', msg: '190 SLOWDOWNS FOUND · RELIEF ON'}
+};
+const $ = id => document.getElementById(id);
+const st = $('st'), vA = $('vA'), vB = $('vB'), knob = $('knob');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let shot = 'sing', x = 1, state = 'alone', seen = false, visible = false, timer = 0, anim = 0;
+
+const play = v => v.play().catch(() => {});
+function setX(p) {
+  x = Math.max(0, Math.min(1, p));
+  st.style.setProperty('--x', (x * 100).toFixed(2) + '%');
+  knob.setAttribute('aria-valuenow', Math.round(x * 100));
+}
+function setState(s) {
+  state = s;
+  st.classList.toggle('healing', s === 'healing');
+  st.classList.toggle('healed', s === 'healed');
+}
+function load(s) {
+  shot = s;
+  const f = 'media/' + SHOTS[s].v;
+  vA.poster = f + '-alone.jpg'; vB.poster = f + '-heal.jpg';
+  vA.src = f + '-alone.mp4'; vB.src = f + '-heal.mp4';
+  $('fa').textContent = SHOTS[s].a + ' FPS'; $('fb').textContent = SHOTS[s].b + ' FPS';
+  document.querySelectorAll('[data-s]').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === s));
+  reset();
+}
+function reset() {
+  cancelAnimationFrame(anim); clearTimeout(timer);
+  setState('alone'); setX(1); $('msg').textContent = '';
+  if (visible) play(vA);
+  vB.pause();
+}
+function heal() {
+  if (state !== 'alone') return;
+  clearTimeout(timer); seen = true;
+  setState('healing'); $('msg').textContent = SHOTS[shot].msg;
+  vB.currentTime = vA.currentTime || 0; play(vA); play(vB);
+  const t0 = performance.now(), dur = reduce ? 0 : 1300;
+  const step = now => {
+    const t = dur ? Math.min(1, (now - t0) / dur) : 1;
+    setX(1 - 0.5 * (1 - Math.pow(1 - t, 3)));
+    if (t < 1) { anim = requestAnimationFrame(step); return; }
+    setState('healed');
+    $('hint').classList.add('on'); setTimeout(() => $('hint').classList.remove('on'), 2500);
+  };
+  anim = requestAnimationFrame(step);
+}
+document.querySelector('.cta').onclick = heal;
+$('again').onclick = () => { reset(); play(vA); };
+document.querySelectorAll('[data-s]').forEach(b => b.onclick = () => load(b.dataset.s));
+
+// drag: mouse moves at once, touch only after a sideways move, so a vertical swipe still scrolls the page
+let drag = null;
+st.addEventListener('pointerdown', e => {
+  if (state !== 'healed' || e.target.closest('button')) return;
+  drag = {id: e.pointerId, x0: e.clientX, y0: e.clientY, on: e.pointerType === 'mouse' || e.target === knob || knob.contains(e.target)};
+  if (drag.on) { st.setPointerCapture(e.pointerId); move(e); }
+});
+st.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  if (!drag.on && Math.abs(e.clientX - drag.x0) > 8 && Math.abs(e.clientX - drag.x0) > Math.abs(e.clientY - drag.y0)) {
+    drag.on = true; st.setPointerCapture(e.pointerId);
+  }
+  if (drag.on) move(e);
+});
+const end = () => { drag = null; };
+st.addEventListener('pointerup', e => { if (drag && !drag.on && e.pointerType !== 'mouse') move(e); end(); });
+st.addEventListener('pointercancel', end);
+function move(e) { const r = st.getBoundingClientRect(); setX((e.clientX - r.left) / r.width); }
+knob.addEventListener('keydown', e => {
+  const k = {ArrowLeft: -0.05, ArrowRight: 0.05, ArrowDown: -0.05, ArrowUp: 0.05}[e.key];
+  if (k) setX(x + k); else if (e.key === 'Home') setX(0); else if (e.key === 'End') setX(1); else return;
+  e.preventDefault();
+});
+
+// keep both recordings on the same moment; a small drift is invisible, constant seeking is not
+setInterval(() => {
+  if (state !== 'alone' && !vB.paused && vA.readyState > 1 && Math.abs(vA.currentTime - vB.currentTime) > 0.25) vA.currentTime = vB.currentTime;
+}, 400);
+
+// play only while on screen; heal by itself once, 4 s after it first shows
+new IntersectionObserver(es => es.forEach(e => {
+  visible = e.isIntersecting && e.intersectionRatio >= 0.35;
+  if (!visible) { vA.pause(); vB.pause(); clearTimeout(timer); return; }
+  play(vA); if (state !== 'alone') play(vB);
+  if (!seen && state === 'alone') timer = setTimeout(heal, 4000);
+}), {threshold: [0, 0.35, 1]}).observe(st);
+
+load('sing');
+</script>
+</body>
+</html>
