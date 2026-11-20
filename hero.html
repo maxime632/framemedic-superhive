@@ -48,7 +48,8 @@ button{font:inherit;letter-spacing:inherit;border:0;margin:0;cursor:pointer}
 .bar button:hover{background:rgba(40,40,40,.9)}
 .bar button[aria-pressed=true]{background:#fff;color:#1C1C1C}
 .bar button:focus-visible{outline:2px solid #CEFF05;outline-offset:1px}
-#again{margin:0 0 0 auto}
+#pp{margin-left:auto}
+#again{margin:0}
 .st:not(.healed) #again{visibility:hidden}
 @media (max-width:440px){.tag{flex-wrap:wrap;max-width:46%}.tag b{flex-basis:100%;margin:.45em 0 0 1.3em}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -69,14 +70,15 @@ button{font:inherit;letter-spacing:inherit;border:0;margin:0;cursor:pointer}
     <span class="msg" id="msg" aria-live="polite"></span>
   </div>
   <div class="bar">
-    <button data-s="sing" aria-pressed="true">SINGULARITY</button><button data-s="charge" aria-pressed="false">CHARGE</button>
-    <button id="again" aria-label="Play the comparison again">↻ AGAIN</button>
+    <button data-s="sing" aria-pressed="true">SINGULARITY</button><button data-s="orbit" aria-pressed="false">ORBIT</button><button data-s="charge" aria-pressed="false">CHARGE</button>
+    <button id="pp" aria-label="Pause">❚❚</button><button id="again" aria-label="Play the comparison again">↻ AGAIN</button>
   </div>
 </div>
 <script>
 // fps = pictures per second measured in Blender with Frame Dropping, no recording running (River 7, fixed 1.1.0)
 const SHOTS = {
   sing: {v: 'sing-cam', a: '1.6', b: '20.0', msg: '140 SLOWDOWNS FOUND · 12 FIXED'},
+  orbit: {v: 'sing-orbit', a: '1.6', b: '20.0', msg: '140 SLOWDOWNS FOUND · 12 FIXED'},
   charge: {v: 'charge-orbit', a: '1.2', b: '19.6', msg: '190 SLOWDOWNS FOUND · RELIEF ON'}
 };
 const $ = id => document.getElementById(id);
@@ -84,7 +86,8 @@ const st = $('st'), vA = $('vA'), vB = $('vB'), knob = $('knob');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let shot = 'sing', x = 1, state = 'alone', seen = false, visible = false, timer = 0, anim = 0;
 
-const play = v => v.play().catch(() => {});
+let paused = false;
+const play = v => { if (!paused) v.play().catch(() => {}); };
 function setX(p) {
   x = Math.max(0, Math.min(1, p));
   st.style.setProperty('--x', (x * 100).toFixed(2) + '%');
@@ -128,6 +131,11 @@ function heal() {
 document.querySelector('.cta').onclick = heal;
 $('again').onclick = () => { reset(); play(vA); };
 document.querySelectorAll('[data-s]').forEach(b => b.onclick = () => load(b.dataset.s));
+$('pp').onclick = () => {
+  paused = !paused;
+  $('pp').textContent = paused ? '▶' : '❚❚'; $('pp').setAttribute('aria-label', paused ? 'Play' : 'Pause');
+  if (paused) { vA.pause(); vB.pause(); } else { play(vA); if (state !== 'alone') play(vB); }
+};
 
 // drag: mouse moves at once, touch only after a sideways move, so a vertical swipe still scrolls the page
 let drag = null;
